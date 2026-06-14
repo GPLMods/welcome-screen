@@ -25,7 +25,7 @@ function pingServer() {
             if (dest && dest.startsWith('/')) {
                 window.location.href = MAIN_SITE_URL + dest;
             } else {
-                window.location.href = MAIN_SITE_URL + '/home';
+                window.location.href = MAIN_SITE_URL + '/';
             }
         }, 800);
     };
