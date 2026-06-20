@@ -2,10 +2,55 @@
 const MAIN_SITE_URL = 'https://gplmods.webredirect.org';
 
 // -------------------------------------------------------------
-// PING LOGIC (Instant Redirect / No 30s Wait)
+// PING LOGIC (With Success & Error Overlay Restored!)
 // -------------------------------------------------------------
 let isChecking = true;
-let isRedirecting = false; // Prevent multiple redirects from firing
+let isRedirecting = false; 
+
+function triggerFinalStatus(isSuccess) {
+    const overlay = document.getElementById('status-overlay');
+    const statusLottie = document.getElementById('status-lottie');
+    const statusText = document.getElementById('status-text');
+    
+    // We didn't explicitly have redirect-text in the recent HTML, so we create/find it safely
+    let redirectText = document.getElementById('redirect-text');
+    if (!redirectText && isSuccess) {
+        redirectText = document.createElement('p');
+        redirectText.id = 'redirect-text';
+        redirectText.style.cssText = "color: var(--silver); font-size: 0.9em; margin-top: 10px;";
+        statusText.after(redirectText);
+    }
+    
+    overlay.classList.add('show');
+    
+    if (isSuccess) {
+        // ✅ RESTORED: Play Success Animation
+        statusLottie.setAttribute('src', '/assets/animations/success.json');
+        
+        statusText.innerHTML = "Connection Established!";
+        statusText.style.color = "var(--green)";
+        if(redirectText) redirectText.innerHTML = "Redirecting securely...";
+        
+        setTimeout(() => { 
+            const urlParams = new URLSearchParams(window.location.search);
+            const destinationPath = urlParams.get('dest');
+            
+            if (destinationPath && destinationPath.startsWith('/')) {
+                window.location.href = MAIN_SITE_URL + destinationPath;
+            } else {
+                window.location.href = MAIN_SITE_URL + '/home'; 
+            }
+        }, 1800); // 1.8 second delay to let them admire the "Success" checkmark!
+        
+    } else {
+        // ✅ RESTORED: Play Error Animation
+        statusLottie.setAttribute('src', '/assets/animations/error.json');
+        
+        statusText.innerHTML = "Server Timeout. Please proceed manually.";
+        statusText.style.color = "var(--red)";
+        document.getElementById('fallback-btn').style.display = 'inline-block';
+    }
+}
 
 function pingServer() {
     if (!isChecking || isRedirecting) return;
@@ -17,6 +62,10 @@ function pingServer() {
         isChecking = false;
         isRedirecting = true; // Lock it down
         
+<<<<<<< HEAD
+        // Trigger the visual success state instead of an instant invisible redirect
+        triggerFinalStatus(true);
+=======
         const urlParams = new URLSearchParams(window.location.search);
         const dest = urlParams.get('dest');
         
@@ -28,11 +77,11 @@ function pingServer() {
                 window.location.href = MAIN_SITE_URL + '/';
             }
         }, 800);
+>>>>>>> 1ec287866dd7c1e47b54a7904020d9f9097c6ae5
     };
     
     img.onerror = function() {
-        // Just log silently, keep playing animations
-        // console.log("Main server is sleeping, continuing animation sequence...");
+        // Log silently, keep playing animations
     };
     
     img.src = MAIN_SITE_URL + '/favicon.png?cachebuster=' + new Date().getTime();
@@ -45,15 +94,9 @@ setTimeout(() => {
     if (!isRedirecting) {
         isChecking = false;
         clearInterval(pingInterval);
-        
-        const overlay = document.getElementById('status-overlay');
-        const lottie = document.getElementById('status-lottie');
-        
-        overlay.classList.add('show');
-        lottie.setAttribute('src', '/assets/animations/error.json'); // Adjusted path to root
-        document.getElementById('fallback-btn').style.display = 'inline-block';
+        triggerFinalStatus(false);
     }
-}, 120000); // 2 minutes
+}, 120000); 
 
 pingServer(); 
 
@@ -318,7 +361,6 @@ const getGreeting = () => {
 const contentData = [
     {
         svg: `<svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" fill="rgba(255,215,0,0.1)" stroke="#FFD700"/><path d="M12 8v4l3 3" stroke="#E0E0E0"/></svg>`,
-        // ✅ RESTORED TEXT ARRAYS
         texts: [
             `${getGreeting()} GPL Mods... Establishing a secure connection to the network...`,
             `Connecting you to the GPL Mods Network. Please hold on...`,
@@ -328,7 +370,7 @@ const contentData = [
         media: "" 
     },
     {
-        svg: `<svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" fill="rgba(255,215,0,0.1)" stroke="#FFD700"/></svg>`,
+        svg: `<svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" fill="rgba(255,215,0,0.1)" stroke="#FFD700"/></svg>`,
         texts: [
             "GPL Mods is always free for everyone because it is a community-driven platform...",
             "Thanks for supporting the project. Your visits keep us going. Welcome to GPL Mods...",
@@ -338,14 +380,44 @@ const contentData = [
         media: "/assets/images/team.glb" 
     },
     {
+        svg: `<svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2" fill="rgba(255,215,0,0.1)" stroke="#FFD700"/><path d="M7 11V7a5 5 0 0 1 10 0v4" stroke="#E0E0E0"/></svg>`,
+        texts: [
+            "GPL Mods is not a person, it is an ideal. Don't look for a CEO...",
+            "Our mission is simple: safe access, no subscriptions, no paywalls.",
+            "This is community code for the community. Open, honest, and free."
+        ],
+        lottie: "/assets/animations/identity.json", 
+        media: "" 
+    },
+    {
+        svg: `<svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" stroke="#FFD700"/><circle cx="12" cy="7" r="4" fill="rgba(255,215,0,0.1)" stroke="#E0E0E0"/></svg>`,
+        texts: [
+            "Maintained passionately by a single developer, ensuring quality and security...",
+            "Every update is hand-tested and deployed with care, no bots, no spam.",
+            "Community-first support with fast response and honest software delivery."
+        ],
+        lottie: "/assets/animations/star.json", 
+        media: "" 
+    },
+    {
         svg: `<svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6" stroke="#FFD700"/><polyline points="8 6 2 12 8 18" stroke="#E0E0E0"/></svg>`,
         texts: [
-            "Open-source philosophy: GPL Mods is 100% open-source and available on GitHub...",
             "100% open-source and transparent. Explore our backend source code safely via GitHub.",
-            "Built on trust. Our backend code is publicly verifiable on our GitHub repo..."
+            "We publish what we build so you can verify every release yourself.",
+            "Open code means trust. GPL Mods is built on openness, not secrecy."
         ],
         lottie: "/assets/animations/opensource.json", 
         media: "/assets/images/code.glb" 
+    },
+    {
+        svg: `<svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10" stroke="#FFD700"/><line x1="2" y1="12" x2="22" y2="12" stroke="#E0E0E0"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" fill="rgba(255,215,0,0.1)" stroke="#FFD700"/></svg>`,
+        texts: [
+            "GPL Mods is for Everyone, Because India Loves Every Nation...",
+            "Connections without borders. This platform welcomes all users.",
+            "Every download is shared globally with a simple, accessible interface."
+        ],
+        lottie: "/assets/animations/globe.json", 
+        media: "" 
     },
     {
         svg: `<svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="6" width="20" height="12" rx="2" ry="2" fill="rgba(255,215,0,0.1)" stroke="#FFD700"/><line x1="6" y1="12" x2="10" y2="12" stroke="#E0E0E0"/><line x1="8" y1="10" x2="8" y2="14" stroke="#E0E0E0"/><line x1="15" y1="13" x2="15.01" y2="13" stroke="#E0E0E0" stroke-width="3"/><line x1="18" y1="11" x2="18.01" y2="11" stroke="#E0E0E0" stroke-width="3"/></svg>`,
@@ -362,19 +434,9 @@ const contentData = [
         ]
     },
     {
-        svg: `<svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17" stroke="#FFD700"/><polyline points="16 7 22 7 22 13" stroke="#FFD700"/></svg>`,
-        texts: [
-            "Want to earn money and get traffic for your mods? Apply as a Distributor...",
-            "Are you a modder? Apply for a Distributor role and monetize your personal download links safely.",
-            "Monetize your own links! Join the GPL Mods Distributor Partnership program today..."
-        ],
-        lottie: "/assets/animations/graph.json", 
-        media: "/assets/images/graph.glb"
-    },
-    {
         svg: `<svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="23 7 16 12 23 17 23 7" fill="rgba(255,215,0,0.1)" stroke="#FFD700"/><rect x="1" y="5" width="15" height="14" rx="2" ry="2" stroke="#E0E0E0"/></svg>`,
         texts: [
-            `Want a professional, ad-free mobile editor? Try Kinemaster Pro GPL Edition for ${getCurrencyStr()}...`,
+            `Want a professional, ad-free mobile editor? Try Kinemaster Pro Edition for exactly ${getCurrencyStr()}...`,
             `Edit like a pro without the watermark. Download Kinemaster Premium for exactly ${getCurrencyStr()}...`,
             `Stop paying subscriptions. Get ad-free editing tools like Kinemaster entirely for ${getCurrencyStr()}...`
         ],
@@ -386,6 +448,16 @@ const contentData = [
         ]
     },
     {
+        svg: `<svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10" fill="rgba(255,215,0,0.1)" stroke="#FFD700"/><path d="M16 8h-6a2 2 0 1 0 0 4h4a2 2 0 1 1 0 4H8" stroke="#E0E0E0"/><path d="M12 18V6" stroke="#E0E0E0"/></svg>`,
+        texts: [
+            `You think the starting budget of GPL Mods was high? No, it was exactly ${getCurrencyStr()}...`,
+            `Every resource was invested in reliability and uptime, not flashy ads.`,
+            `This project started lean, stayed clean, and remains free for everyone.`
+        ],
+        lottie: "/assets/animations/budget.json", 
+        media: "" 
+    },
+    {
         svg: `<svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="2 4 5 15 12 20 19 15 22 4 16 8 12 2 8 8 2 4" fill="rgba(255,215,0,0.1)" stroke="#FFD700"/></svg>`,
         texts: [
             "Tired of viewing ads? Don't worry, GPL+ is here. No ads, full premium experience...",
@@ -393,6 +465,26 @@ const contentData = [
             "Want the ultimate experience? GPL Mods+ gives you zero ads and maximum speed..."
         ],
         lottie: "/assets/animations/crown.json", 
+        media: "" 
+    },
+    {
+        svg: `<svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17" stroke="#FFD700"/><polyline points="16 7 22 7 22 13" stroke="#FFD700"/></svg>`,
+        texts: [
+            "Are you a modder? Apply for a Distributor role and monetize your personal download links safely.",
+            "Take control of your own traffic and earn through shared GPL Downloads.",
+            "Distributor partnerships are open for trusted creators with verified uploads."
+        ],
+        lottie: "/assets/animations/graph.json", 
+        media: "/assets/images/distributor.glb"
+    },
+    {
+        svg: `<svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" fill="rgba(255,215,0,0.1)" stroke="#FFD700"/></svg>`,
+        texts: [
+            "Thanks for supporting the project. This is the true power of community...",
+            "Every click and share helps us keep GPL Mods running for everyone.",
+            "Your trust is what powers this open platform. Thank you."
+        ],
+        lottie: "/assets/animations/thanks.json", 
         media: "" 
     }
 ];
