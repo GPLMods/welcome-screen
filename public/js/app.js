@@ -38,7 +38,7 @@ function triggerFinalStatus(isSuccess) {
             if (destinationPath && destinationPath.startsWith('/')) {
                 window.location.href = MAIN_SITE_URL + destinationPath;
             } else {
-                window.location.href = MAIN_SITE_URL + '/home'; 
+                window.location.href = MAIN_SITE_URL + '/'; 
             }
         }, 1800); // 1.8 second delay to let them admire the "Success" checkmark!
         
