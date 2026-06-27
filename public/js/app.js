@@ -62,10 +62,9 @@ function pingServer() {
         isChecking = false;
         isRedirecting = true; // Lock it down
         
-<<<<<<< HEAD
         // Trigger the visual success state instead of an instant invisible redirect
         triggerFinalStatus(true);
-=======
+
         const urlParams = new URLSearchParams(window.location.search);
         const dest = urlParams.get('dest');
         
@@ -77,7 +76,6 @@ function pingServer() {
                 window.location.href = MAIN_SITE_URL + '/';
             }
         }, 800);
->>>>>>> 1ec287866dd7c1e47b54a7904020d9f9097c6ae5
     };
     
     img.onerror = function() {
