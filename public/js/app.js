@@ -130,7 +130,7 @@ function initializeMusicPlayer() {
     }
 
      const playlist =[
-        { title: 'Welcome', src: '/assets/audio/bgm-0.mp3' },
+        { title: 'Night Ride', src: '/assets/audio/bgm-0.mp3' },
         { title: 'Whoopty', src: '/assets/audio/bgm-1.mp3' },
         { title: 'Nekozilla', src: '/assets/audio/bgm-2.mp3' },
         { title: 'Heroes Tonight', src: '/assets/audio/bgm-3.mp3' },
