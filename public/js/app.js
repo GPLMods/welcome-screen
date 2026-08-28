@@ -139,7 +139,7 @@ function initializeMusicPlayer() {
         { title: 'Mortals', src: '/assets/audio/bgm-6.mp3' },
         { title: 'On & On', src: '/audio/bgm-7.mp3' },
         { title: 'Rise Up', src: '/audio/bgm-8.mp3' },
-        { title: 'Wrong Side Out', src: '/audio/bgm-9.mp3' }        
+        { title: 'Tiger Tracks', src: '/audio/bgm-9.mp3' }        
     ];
     
     let currentSource = localStorage.getItem('musicSource') || 'local';
@@ -597,7 +597,7 @@ const specificMods = [
     { name: "Elementor Pro", cert: "Comm. Tested", tag: "WordPress", v: "v3.15", view: "850K", src: "elementor.jpg", class: "tag-wordpress" },
     { name: "Astra", cert: "✔ Certified", tag: "WordPress", v: "v2.23", view: "420K", src: "astra.jpg", class: "tag-wordpress" },
     { name: "Fortnight", cert: "✔ Certified", tag: "iOS Jailed", v: "v29.10", view: "2.1M", src: "fortnite.jpg", class: "tag-ios" },
-    { name: "Minecraft PE", cert: "✔ Certified", tag: "iOS Jailed", v: "v1.20", view: "5.4M", src: "minecraft.jpg", class: "tag-ios" },
+    { name: "Minecraft", cert: "✔ Certified", tag: "iOS Jailed", v: "v1.20", view: "5.4M", src: "minecraft.jpg", class: "tag-ios" },
     { name: "Schedule I", cert: "Comm. Tested", tag: "Windows", v: "v1.0.4", view: "105K", src: "schedule1.jpg", class: "tag-windows" },
     { name: "I Am Fish", cert: "✔ Certified", tag: "Windows", v: "v2.1", view: "67K", src: "iamfish.jpg", class: "tag-windows" }
 ];
