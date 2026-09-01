@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GPL Mods - System Status & Welcome</title>
+    
+    <!-- Google Fonts & Icons -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+    <style>
+        :root {
+            --black: #0a0a0a;
+            --dark-gray: #1a1a1a;
+            --white: #ffffff;
+            --gold: #FFD700;
+            --silver: #c0c0c0;
+            --red: #e53935;
+            --green: #43a047;
+            --glow-gold: rgba(255, 215, 0, 0.5);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            font-family: 'Poppins', sans-serif; 
+            background-color: var(--black); 
+            color: var(--white); 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            min-height: 100vh; 
+            background-image: radial-gradient(circle at top, #1a1a1a 0%, #0a0a0a 100%);
+        }
+
+        .container {
+            max-width: 600px;
+            width: 90%;
+            margin: 40px auto;
+            text-align: center;
+        }
+
+        .logo { font-size: 3em; font-weight: 700; color: var(--gold); text-shadow: 0 0 15px var(--glow-gold); text-decoration: none; display: inline-block; margin-bottom: 20px;}
+        .logo span { color: var(--silver); text-shadow: none; }
+
+        .status-card {
+            background-color: var(--dark-gray);
+            border-radius: 15px;
+            padding: 40px 30px;
+            border: 1px solid #333;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.5);
+            margin-bottom: 30px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* --- The Traffic Light Status Indicator --- */
+        .status-indicator {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 20px;
+            padding: 15px;
+            border-radius: 10px;
+            background: #111;
+        }
+
+        .status-dot {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background-color: #555; /* Default Gray */
+            transition: all 0.3s ease;
+        }
+
+        /* Animations for different states */
+        @keyframes pulse-green { 0% { box-shadow: 0 0 0 0 rgba(67, 160, 71, 0.7); } 70% { box-shadow: 0 0 0 15px rgba(67, 160, 71, 0); } 100% { box-shadow: 0 0 0 0 rgba(67, 160, 71, 0); } }
+        @keyframes pulse-yellow { 0% { box-shadow: 0 0 0 0 rgba(255, 215, 0, 0.7); } 70% { box-shadow: 0 0 0 15px rgba(255, 215, 0, 0); } 100% { box-shadow: 0 0 0 0 rgba(255, 215, 0, 0); } }
+        @keyframes pulse-red { 0% { box-shadow: 0 0 0 0 rgba(229, 57, 53, 0.7); } 70% { box-shadow: 0 0 0 15px rgba(229, 57, 53, 0); } 100% { box-shadow: 0 0 0 0 rgba(229, 57, 53, 0); } }
+
+        .status-green .status-dot { background-color: var(--green); animation: pulse-green 2s infinite; }
+        .status-yellow .status-dot { background-color: var(--gold); animation: pulse-yellow 2s infinite; }
+        .status-red .status-dot { background-color: var(--red); animation: pulse-red 2s infinite; }
+
+        .status-text { font-size: 1.5em; font-weight: bold; }
+        .status-message { color: var(--silver); font-size: 1em; line-height: 1.6; }
+
+        .btn-redirect {
+            display: inline-block;
+            margin-top: 25px;
+            padding: 12px 30px;
+            background-color: var(--gold);
+            color: var(--black);
+            text-decoration: none;
+            font-weight: bold;
+            border-radius: 25px;
+            transition: all 0.3s ease;
+            box-shadow: 0 0 15px var(--glow-gold);
+            cursor: pointer;
+            border: none;
+            font-size: 1.1em;
+        }
+        .btn-redirect:hover { transform: translateY(-3px); box-shadow: 0 0 25px var(--glow-gold); }
+        .btn-redirect:disabled { background: #444; color: #888; box-shadow: none; cursor: not-allowed; transform: none; }
+
+        /* Tech Details Network Box */
+        .tech-card {
+            background-color: #111;
+            border: 1px solid #333;
+            border-radius: 12px;
+            padding: 20px;
+            text-align: left;
+            font-size: 0.9em;
+            color: var(--silver);
+            margin-top: 30px;
+        }
+        .tech-card h3 { color: var(--white); margin-bottom: 15px; border-bottom: 1px solid #333; padding-bottom: 8px; font-size: 1.2em;}
+        .tech-grid { display: grid; grid-template-columns: 1fr; gap: 10px; }
+        .tech-item { display: flex; justify-content: space-between; border-bottom: 1px dashed #222; padding-bottom: 5px;}
+        .tech-item span:last-child { font-family: monospace; color: var(--gold); }
+        .tech-item a { color: var(--gold); text-decoration: none; }
+        .tech-item a:hover { text-decoration: underline; }
+
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <a href="#" class="logo">GPL <span>Mods</span></a>
+        
+        <div class="status-card" id="statusContainer">
+            <h2 style="margin-bottom: 15px;">Main Server Connection</h2>
+            
+            <div class="status-indicator" id="statusIndicator">
+                <div class="status-dot"></div>
+                <div class="status-text" id="statusText">Pinging Server...</div>
+            </div>
+
+            <p class="status-message" id="statusMessage">
+                Please wait while we establish a connection to the main GPL Mods cluster.
+            </p>
+
+            <button id="mainBtn" class="btn-redirect" disabled>
+                <i class="fas fa-spinner fa-spin"></i> Establishing Connection...
+            </button>
+        </div>
+
+        <!-- Technical Network Details -->
+        <div class="tech-card">
+            <h3><i class="fas fa-network-wired" style="color: var(--gold); margin-right: 8px;"></i> Network Topology</h3>
+            <div class="tech-grid">
+                <div class="tech-item">
+                    <span>Main Domain:</span>
+                    <a href="https://gplmods.webredirect.org" target="_blank">gplmods.webredirect.org</a>
+                </div>
+                <div class="tech-item">
+                    <span>Anti-Revoke Archive DNS:</span>
+                    <a href="https://gplmods.mytunnel.org" target="_blank">gplmods.mytunnel.org</a>
+                </div>
+                <div class="tech-item">
+                    <span>Render Main IP Ranges:</span>
+                    <span>74.220.52.0/24 | 74.220.60.0/24</span>
+                </div>
+                <div class="tech-item">
+                    <span>CDN Edge:</span>
+                    <span>cdn.gplmodsofficial.workers.dev</span>
+                </div>
+                <div class="tech-item" style="border: none;">
+                    <span>Failback JS Host:</span>
+                    <span>gplmods.great-site.net</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MAIN PING LOGIC -->
+    <script>
+        const MAIN_URL = 'https://gplmods.webredirect.org';
+        const HEALTH_ENDPOINT = MAIN_URL + '/healthz';
+        
+        const statusContainer = document.getElementById('statusContainer');
+        const statusIndicator = document.getElementById('statusIndicator');
+        const statusText = document.getElementById('statusText');
+        const statusMessage = document.getElementById('statusMessage');
+        const mainBtn = document.getElementById('mainBtn');
+
+        function setStatus(state, delay) {
+            statusIndicator.className = `status-indicator status-${state}`;
+            
+            if (state === 'green') {
+                statusText.innerText = 'Online & Active';
+                statusText.style.color = 'var(--green)';
+                statusMessage.innerHTML = 'The server is fully awake and responding optimally. You can proceed to the main website.';
+                mainBtn.innerHTML = 'Enter GPL Mods <i class="fas fa-arrow-right"></i>';
+                mainBtn.disabled = false;
+                mainBtn.onclick = () => window.location.href = MAIN_URL;
+                
+                // Optional: Auto redirect after 3 seconds if green
+                // setTimeout(() => { window.location.href = MAIN_URL; }, 3000);
+
+            } else if (state === 'yellow') {
+                statusText.innerText = 'Server Waking Up...';
+                statusText.style.color = 'var(--gold)';
+                statusMessage.innerHTML = 'Because we use a scalable cloud host, the server sleeps during low activity. It is currently waking up. <strong>This usually takes 30 to 60 seconds.</strong> Please wait, we will redirect you automatically.';
+                mainBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Booting Container...';
+                mainBtn.disabled = true;
+                
+                // Re-poll the server after a delay to see if it woke up
+                setTimeout(checkServerStatus, 5000);
+
+            } else if (state === 'red') {
+                statusText.innerText = 'Service Offline';
+                statusText.style.color = 'var(--red)';
+                statusMessage.innerHTML = 'The main Render service is currently unreachable or undergoing maintenance. Please use our Anti-Revoke Archive DNS in the meantime.';
+                
+                mainBtn.innerHTML = '<i class="fas fa-shield-alt"></i> Go to Archive DNS';
+                mainBtn.disabled = false;
+                mainBtn.style.backgroundColor = 'var(--red)';
+                mainBtn.style.color = 'var(--white)';
+                mainBtn.style.boxShadow = '0 0 15px rgba(229, 57, 53, 0.5)';
+                mainBtn.onclick = () => window.location.href = 'https://gplmods.mytunnel.org';
+            }
+        }
+
+        async function checkServerStatus() {
+            const startTime = Date.now();
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 15000); // 15 second timeout
+
+            try {
+                // We fetch the healthz endpoint. Note: mode: 'no-cors' is used just in case CORS fails,
+                // but since we rely on the response time, catching an error or delay is the main goal.
+                const response = await fetch(HEALTH_ENDPOINT, { 
+                    method: 'GET', 
+                    signal: controller.signal,
+                    cache: 'no-store'
+                });
+
+                clearTimeout(timeoutId);
+                const responseTime = Date.now() - startTime;
+
+                if (response.ok || response.type === 'opaque') {
+                    // Render free tier spins down. If it takes > 3.5 seconds to reply, it was definitely asleep and is booting up.
+                    if (responseTime > 3500) {
+                        setStatus('yellow', responseTime);
+                    } else {
+                        setStatus('green', responseTime);
+                    }
+                } else {
+                    setStatus('red');
+                }
+            } catch (error) {
+                clearTimeout(timeoutId);
+                // If it's an AbortError, it timed out (took longer than 15s), meaning it's still waking up or heavily congested
+                if (error.name === 'AbortError') {
+                    setStatus('yellow');
+                } else {
+                    // Actual network error (server is down)
+                    setStatus('red');
+                }
+            }
+        }
+
+        // Start the check as soon as the fallback page loads
+        document.addEventListener('DOMContentLoaded', () => {
+            checkServerStatus();
+        });
+    </script>
+</body>
+</html>
