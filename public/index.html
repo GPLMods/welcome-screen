@@ -8,41 +8,83 @@
     <link rel="apple-touch-icon" href="./assets/images/favicon.png">
     
     <!-- Fonts and Icons -->
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     
     <!-- Custom Stylesheet -->
     <link rel="stylesheet" href="/css/style.css">
-
 </head>
 <body>
 
     <!-- Parallax Card/Review Montage Layer -->
     <div id="montage-layer"></div>
 
+    <!-- TOP TELEMETRY & SYNC HEADER BAR -->
+    <header class="welcome-top-bar">
+        <div id="ping-status-pill" class="telemetry-pill connecting" title="Live Server Synchronization">
+            <span class="pulse-dot"></span>
+            <span id="ping-status-text">Connecting to Server...</span>
+            <span id="ping-latency-badge" class="latency-chip">-- ms</span>
+        </div>
+
+        <div id="region-flag-chip" class="region-flag-chip" title="Detected Region">
+            <span id="region-flag-icon" class="flag-icon">🇮🇳</span>
+            <span id="region-flag-text">India</span>
+        </div>
+    </header>
+
     <!-- MAIN SLIDESHOW INTERFACE -->
     <div id="slideshow-container" class="show">
+        
+        <!-- Logo Area -->
         <div class="logo-area">
             <span class="logo-gpl">GPL</span>
             <span class="logo-mods">Mods</span>
         </div>
 
-        <div class="image-frame-wrapper" id="frame-wrapper">
-            <div class="animated-frame" id="dynamic-frame">
-                <!-- 1. Fallback Image for standard mod screenshots -->
-                <img id="dynamic-image" src="" alt="Showcase Image" style="display: none;">
-                
-                <!-- 2. Model Viewer for 3D GLB Support -->
-                <model-viewer id="dynamic-model" src="" auto-rotate rotation-per-second="30deg" interaction-prompt="none" shadow-intensity="1" style="display: none;"></model-viewer>
-                
-             <!-- ✅ FIX 1: Make absolutely certain all required autoplay bypass tags are present -->
-            <video id="dynamic-video" preload="auto" loop muted playsinline autoplay style="display: none;"></video>
+        <!-- Optional Shared Entity Banner (If arrived via share API) -->
+        <div id="shared-entity-banner" class="shared-entity-banner" style="display: none;">
+            <div class="shared-banner-icon"><i class="fas fa-share-nodes"></i></div>
+            <div class="shared-banner-info">
+                <span id="shared-banner-title">Shared Link Detected</span>
+                <p id="shared-banner-desc">Redirecting to targeted destination upon handshake...</p>
             </div>
         </div>
 
+        <!-- Showcase Media Frame Wrapper with Floating Animated Satellites -->
+        <div class="image-frame-wrapper" id="frame-wrapper">
+            <div class="satellite-container" id="satellite-container">
+                <!-- Floating satellite icon badges for videos & 3D models -->
+                <div class="satellite-badge satellite-left" id="satellite-left" style="display: none;">
+                    <img id="satellite-left-img" src="/assets/images/default-app-icon.png" alt="App Icon">
+                </div>
+                <div class="satellite-badge satellite-right" id="satellite-right" style="display: none;">
+                    <img id="satellite-right-img" src="/assets/images/default-avatar.png" alt="Icon">
+                </div>
+            </div>
+
+            <div class="animated-frame" id="dynamic-frame">
+                <!-- Video indicator badge -->
+                <div id="frame-video-tag" class="frame-video-tag" style="display: none;">
+                    <i class="fas fa-play-circle"></i> <span id="frame-video-tag-text">HD SHOWCASE</span>
+                </div>
+
+                <!-- 1. Video Player (Prioritized for Video Showcases like Kinemaster) -->
+                <video id="dynamic-video" preload="auto" loop muted playsinline autoplay style="display: none;"></video>
+
+                <!-- 2. Fallback Image for standard mod screenshots -->
+                <img id="dynamic-image" src="" alt="Showcase Image" style="display: none;">
+                
+                <!-- 3. Model Viewer for 3D GLB Support -->
+                <model-viewer id="dynamic-model" src="" auto-rotate rotation-per-second="30deg" interaction-prompt="none" shadow-intensity="1" style="display: none;"></model-viewer>
+            </div>
+        </div>
+
+        <!-- Message Box with Animated Lottie & Text -->
         <div class="message-container" id="message-wrapper">
             <div class="lottie-box">
-                <!-- ✅ FIX: Set the initial src immediately so the component doesn't crash on boot -->
                 <lottie-player id="dynamic-lottie" src="/assets/animations/welcome.json" background="transparent" speed="1" loop autoplay></lottie-player>
             </div>
             <div class="text-content-wrapper">
@@ -59,41 +101,62 @@
         <a href="https://gplmods.webredirect.org/home" class="fallback-btn" id="fallback-btn">Proceed Manually</a>
     </div>
   
-    <!-- ======== ADD THE FLOATING MUSIC PLAYER HERE ======== -->
-    <div id="floating-music-player" class="floating-music-player"> <!-- Adding "open" initially is up to you -->
-        <button id="music-toggle-btn" class="music-toggle-btn" title="Toggle Music Player">
+    <!-- ======== FLOATING BOTTOM-LEFT MUSIC PLAYER (GPL BEATS - SYNCED WITH SITE) ======== -->
+    <div id="floating-music-player" class="floating-music-player">
+        <button id="music-toggle-btn" class="music-toggle-btn" title="Toggle Music Player" aria-label="Toggle Music Player">
             <i class="fas fa-music"></i>
         </button>
         
         <div class="music-player-content">
+            <div class="music-player-header">
+                <div class="music-header-title">
+                    <i class="fas fa-headphones-alt"></i>
+                    <span>GPL Beats</span>
+                </div>
+                <button id="music-close-btn" class="music-close-card-btn" title="Close" aria-label="Close Music Player"><i class="fas fa-times"></i></button>
+            </div>
+
             <span id="music-track-name" class="track-name">Loading...</span>
             
             <div class="music-controls">
-                <button id="music-prev-btn" class="music-btn"><i class="fas fa-step-backward"></i></button>
-                <button id="music-play-pause-btn" class="music-btn"><i class="fas fa-play" id="play-pause-icon"></i></button>
-                <button id="music-next-btn" class="music-btn"><i class="fas fa-step-forward"></i></button>
+                <button id="music-prev-btn" class="music-btn" title="Previous Track"><i class="fas fa-step-backward"></i></button>
+                <button id="music-play-pause-btn" class="music-btn" title="Play / Pause"><i class="fas fa-play" id="play-pause-icon"></i></button>
+                <button id="music-next-btn" class="music-btn" title="Next Track"><i class="fas fa-step-forward"></i></button>
+                <button id="music-loop-btn" class="music-btn" title="Single Track Loop: OFF (Auto Next)" aria-label="Toggle Single Track Loop"><i class="fas fa-redo" id="music-loop-icon"></i></button>
             </div>
-            
+
+            <!-- Timeline Bar -->
             <div class="timeline-container">
                 <span id="music-current-time">0:00</span>
                 <input type="range" id="music-timeline" min="0" max="100" value="0" step="1">
                 <span id="music-duration">0:00</span>
             </div>
 
+            <!-- Volume Slider -->
             <div class="volume-container">
                 <i class="fas fa-volume-down volume-icon"></i>
                 <input type="range" id="music-volume-slider" min="0" max="1" step="0.01" value="0.25">
                 <i class="fas fa-volume-up volume-icon"></i>
             </div>
+
+            <!-- YouTube Custom Track Loader -->
+            <div class="custom-music-input">
+                <input type="text" id="custom-yt-url" placeholder="Paste YT/YT Music URL..." autocomplete="off">
+                <button id="load-yt-btn" class="music-btn" title="Load Custom Track"><i class="fas fa-search"></i></button>
+            </div>
+            <span id="yt-status-msg" style="display:none; color: var(--gold); font-size: 0.72em; margin-top: 5px;">Track loaded!</span>
         </div>
         
-        <audio id="background-audio" loop></audio>
+        <!-- Hidden Audio and YouTube Players -->
+        <audio id="background-audio"></audio>
         <div id="yt-player-container" style="position: absolute; width: 0; height: 0; pointer-events: none; opacity: 0;"></div>
     </div>
     <!-- =================================================== -->
 
+    <!-- Libraries: Model-Viewer, Lottie Player, YouTube IFrame API -->
     <script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.4.0/model-viewer.min.js"></script>
     <script src="https://unpkg.com/@lottiefiles/lottie-player@latest/dist/lottie-player.js"></script>
+    <script src="https://www.youtube.com/iframe_api"></script>
 
     <!-- App Logic -->
     <script src="/js/app.js"></script>
