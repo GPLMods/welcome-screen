@@ -23,30 +23,30 @@ const CUSTOM_FLAG_PARAM = urlParams.get('flag') || urlParams.get('country');
 // 2. FLAG & REGION DETECTION SYSTEM
 // -------------------------------------------------------------
 const COUNTRY_MAP = {
-    'in': { flag: '🇮🇳', name: 'India', greeting: 'GPL Mods में आपका स्वागत है' },
-    'hi': { flag: '🇮🇳', name: 'India', greeting: 'GPL Mods में आपका स्वागत है' },
-    'us': { flag: '🇺🇸', name: 'United States', greeting: 'Welcome to' },
-    'en': { flag: '🇺🇸', name: 'Global', greeting: 'Welcome to' },
-    'gb': { flag: '🇬🇧', name: 'United Kingdom', greeting: 'Welcome to' },
-    'uk': { flag: '🇬🇧', name: 'United Kingdom', greeting: 'Welcome to' },
-    'es': { flag: '🇪🇸', name: 'Spain', greeting: 'Bienvenido a' },
-    'fr': { flag: '🇫🇷', name: 'France', greeting: 'Bienvenue sur' },
-    'de': { flag: '🇩🇪', name: 'Germany', greeting: 'Willkommen bei' },
-    'br': { flag: '🇧🇷', name: 'Brazil', greeting: 'Bem-vindo ao' },
-    'pt': { flag: '🇧🇷', name: 'Portugal/Brazil', greeting: 'Bem-vindo ao' },
-    'ru': { flag: '🇷🇺', name: 'Russia', greeting: 'Добро пожаловать в' },
-    'sa': { flag: '🇸🇦', name: 'Saudi Arabia', greeting: 'أهلاً بكم في' },
-    'ae': { flag: '🇦🇪', name: 'UAE', greeting: 'أهلاً بكم في' },
-    'ar': { flag: '🇸🇦', name: 'Arabic', greeting: 'أهلاً بكم في' },
-    'jp': { flag: '🇯🇵', name: 'Japan', greeting: 'へようこそ' },
-    'ja': { flag: '🇯🇵', name: 'Japan', greeting: 'へようこそ' }
+    'in': { code: 'in', name: 'India', greeting: 'GPL Mods में आपका स्वागत है' },
+    'hi': { code: 'in', name: 'India', greeting: 'GPL Mods में आपका स्वागत है' },
+    'us': { code: 'us', name: 'United States', greeting: 'Welcome to' },
+    'en': { code: 'us', name: 'Global', greeting: 'Welcome to' },
+    'gb': { code: 'gb', name: 'United Kingdom', greeting: 'Welcome to' },
+    'uk': { code: 'gb', name: 'United Kingdom', greeting: 'Welcome to' },
+    'es': { code: 'es', name: 'Spain', greeting: 'Bienvenido a' },
+    'fr': { code: 'fr', name: 'France', greeting: 'Bienvenue sur' },
+    'de': { code: 'de', name: 'Germany', greeting: 'Willkommen bei' },
+    'br': { code: 'br', name: 'Brazil', greeting: 'Bem-vindo ao' },
+    'pt': { code: 'br', name: 'Portugal/Brazil', greeting: 'Bem-vindo ao' },
+    'ru': { code: 'ru', name: 'Russia', greeting: 'Добро пожаловать в' },
+    'sa': { code: 'sa', name: 'Saudi Arabia', greeting: 'أهلاً بكم في' },
+    'ae': { code: 'ae', name: 'UAE', greeting: 'أهلاً بكم في' },
+    'ar': { code: 'sa', name: 'Arabic', greeting: 'أهلاً بكم في' },
+    'jp': { code: 'jp', name: 'Japan', greeting: 'へようこそ' },
+    'ja': { code: 'jp', name: 'Japan', greeting: 'へようこそ' }
 };
 
 function detectCountry() {
     if (CUSTOM_FLAG_PARAM) {
         const key = CUSTOM_FLAG_PARAM.toLowerCase();
         if (COUNTRY_MAP[key]) return COUNTRY_MAP[key];
-        return { flag: '🌐', name: CUSTOM_FLAG_PARAM, greeting: 'Welcome to' };
+        return { code: 'un', name: CUSTOM_FLAG_PARAM, greeting: 'Welcome to' };
     }
 
     const browserLang = (navigator.language || navigator.userLanguage || 'en-US').toLowerCase();
@@ -57,7 +57,7 @@ function detectCountry() {
     if (region && COUNTRY_MAP[region]) return COUNTRY_MAP[region];
     if (COUNTRY_MAP[lang]) return COUNTRY_MAP[lang];
 
-    return { flag: '🇮🇳', name: 'India (Default)', greeting: 'GPL Mods में आपका स्वागत है' };
+    return { code: 'in', name: 'India (Default)', greeting: 'GPL Mods में आपका स्वागत है' };
 }
 
 const activeCountry = detectCountry();
@@ -65,7 +65,13 @@ const activeCountry = detectCountry();
 function setupRegionUI() {
     const flagEl = document.getElementById('region-flag-icon');
     const textEl = document.getElementById('region-flag-text');
-    if (flagEl) flagEl.textContent = activeCountry.flag;
+    if (flagEl) {
+        flagEl.className = `fi fi-${activeCountry.code || 'in'}`;
+        flagEl.textContent = '';
+        flagEl.style.borderRadius = '2px';
+        flagEl.style.boxShadow = '0 1px 3px rgba(0,0,0,0.5)';
+        flagEl.style.flexShrink = '0';
+    }
     if (textEl) textEl.textContent = activeCountry.name;
 }
 
@@ -610,7 +616,7 @@ const contentData = [
     {
         svg: `<svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10" stroke="#FFD700"/><line x1="2" y1="12" x2="22" y2="12" stroke="#E0E0E0"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" fill="rgba(255,215,0,0.1)" stroke="#FFD700"/></svg>`,
         texts: [
-            `GPL Mods is for Everyone, Because ${activeCountry.name} Loves Every Nation ${activeCountry.flag}...`,
+            `GPL Mods is for Everyone, Because ${activeCountry.name} Welcomes Every Nation...`,
             `Worldwide connectivity without borders. Welcoming creators from all corners of the globe...`,
             `Fast, reliable downloads mirrored worldwide for high speed access.`
         ],

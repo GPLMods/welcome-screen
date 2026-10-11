@@ -2,24 +2,27 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GPL Mods - System Gateway & Status</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+    <title>GPL Mods - Service Gateway & Live Recovery Telemetry</title>
     <link rel="icon" type="image/png" href="./assets/images/default-app-icon.png">
 
-    <!-- Fonts & Font Awesome Icons -->
+    <!-- Fonts & Icons -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    
+    <!-- Lipis Flag Icons (Synced across entire GPL Mods site) -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/lipis/flag-icons@7.2.3/css/flag-icons.min.css" />
 
-    <!-- Main Welcome Screen Stylesheet -->
+    <!-- Main Stylesheet -->
     <link rel="stylesheet" href="./css/style.css">
 
     <style>
         :root {
             --black: #0a0a0a;
             --dark-gray: #1a1a1a;
-            --card-bg: rgba(22, 24, 34, 0.88);
+            --card-bg: rgba(20, 22, 32, 0.92);
             --border-subtle: rgba(255, 255, 255, 0.08);
             --border-dim: #262b3d;
             --white: #ffffff;
@@ -40,35 +43,40 @@
             margin: 0;
             padding: 0;
             box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        html, body {
+            overflow-x: hidden;
+            width: 100%;
+            min-height: 100vh;
         }
 
         body {
             font-family: 'Poppins', sans-serif;
             background-color: var(--black);
             color: var(--white);
-            min-height: 100vh;
             display: flex;
             flex-direction: column;
             align-items: center;
-            overflow-x: hidden;
             background-image:
                 radial-gradient(circle at 50% -10%, #1e2235 0%, #0a0a0a 65%),
-                linear-gradient(rgba(255, 255, 255, 0.018) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(255, 255, 255, 0.018) 1px, transparent 1px);
-            background-size: 100% 100%, 36px 36px, 36px 36px;
+                linear-gradient(rgba(255, 255, 255, 0.015) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255, 255, 255, 0.015) 1px, transparent 1px);
+            background-size: 100% 100%, 32px 32px, 32px 32px;
         }
 
         /* Ambient floating backdrop lights */
         .ambient-glow {
             position: fixed;
-            width: 450px;
-            height: 450px;
+            width: clamp(280px, 45vw, 480px);
+            height: clamp(280px, 45vw, 480px);
             border-radius: 50%;
             pointer-events: none;
-            filter: blur(120px);
+            filter: blur(100px);
             z-index: 0;
-            opacity: 0.18;
-            transition: all 1s ease;
+            opacity: 0.16;
+            transition: all 0.8s ease;
         }
         .glow-top-left {
             top: -100px;
@@ -84,50 +92,61 @@
         /* Top Telemetry Header */
         .gateway-top-bar {
             width: 100%;
-            max-width: 1140px;
-            padding: 20px 24px;
+            max-width: 1100px;
+            padding: 14px 18px;
             display: flex;
             justify-content: space-between;
             align-items: center;
             z-index: 10;
+            gap: 10px;
+            flex-wrap: wrap;
         }
 
         .telemetry-chip-group {
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 8px;
             flex-wrap: wrap;
         }
 
         .telemetry-chip {
             display: inline-flex;
             align-items: center;
-            gap: 8px;
-            padding: 7px 14px;
-            background: rgba(18, 20, 30, 0.85);
+            gap: 7px;
+            padding: 6px 12px;
+            background: rgba(18, 20, 28, 0.85);
             backdrop-filter: blur(12px);
             -webkit-backdrop-filter: blur(12px);
             border: 1px solid var(--border-subtle);
             border-radius: 20px;
-            font-size: 0.82em;
+            font-size: 0.78em;
             color: var(--silver);
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
-            transition: all 0.3s ease;
+            box-shadow: 0 4px 14px rgba(0, 0, 0, 0.5);
+            transition: all 0.25s ease;
         }
 
         .telemetry-chip:hover {
-            border-color: rgba(255, 215, 0, 0.3);
+            border-color: rgba(255, 215, 0, 0.35);
             color: var(--white);
         }
 
+        .telemetry-chip .fi {
+            width: 1.3em;
+            line-height: 1em;
+            border-radius: 2px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.5);
+            flex-shrink: 0;
+        }
+
         .status-dot-pulse {
-            width: 9px;
-            height: 9px;
+            width: 8px;
+            height: 8px;
             border-radius: 50%;
             background-color: var(--amber);
-            box-shadow: 0 0 10px var(--amber);
+            box-shadow: 0 0 8px var(--amber);
             transition: all 0.3s ease;
-            animation: radarPulse 1.8s infinite;
+            animation: radarPulseDot 1.8s infinite;
+            flex-shrink: 0;
         }
 
         .status-dot-pulse.green {
@@ -143,39 +162,48 @@
             box-shadow: 0 0 10px var(--red);
         }
 
+        @keyframes radarPulseDot {
+            0% { transform: scale(0.75); opacity: 0.7; }
+            50% { transform: scale(1.15); opacity: 1; }
+            100% { transform: scale(0.75); opacity: 0.7; }
+        }
+
         .header-actions {
             display: flex;
             align-items: center;
-            gap: 12px;
+            gap: 8px;
+            flex-wrap: wrap;
         }
 
-        .btn-header-reping {
+        .btn-header-action {
             background: rgba(255, 255, 255, 0.05);
             border: 1px solid var(--border-subtle);
             color: var(--silver);
-            padding: 7px 14px;
+            padding: 6px 13px;
             border-radius: 20px;
-            font-size: 0.82em;
+            font-size: 0.78em;
             cursor: pointer;
             display: inline-flex;
             align-items: center;
             gap: 6px;
             transition: all 0.25s ease;
             backdrop-filter: blur(8px);
+            text-decoration: none;
         }
 
-        .btn-header-reping:hover {
+        .btn-header-action:hover {
             color: var(--gold);
             border-color: var(--gold);
-            transform: translateY(-2px);
+            transform: translateY(-1px);
             box-shadow: 0 0 12px var(--glow-gold);
         }
 
         /* Container Layout */
         .gateway-container {
-            max-width: 960px;
-            width: 92%;
-            margin: 15px auto 60px;
+            max-width: 900px;
+            width: 100%;
+            padding: 0 16px;
+            margin: 5px auto 50px;
             text-align: center;
             position: relative;
             z-index: 5;
@@ -186,29 +214,41 @@
 
         /* Main Branding */
         .brand-header {
-            margin-bottom: 25px;
+            margin-bottom: 22px;
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 6px;
+            gap: 4px;
+        }
+
+        .temporary-notice-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            padding: 4px 12px;
+            border-radius: 14px;
+            background: rgba(243, 156, 18, 0.12);
+            border: 1px solid rgba(243, 156, 18, 0.35);
+            color: var(--gold);
+            font-size: 0.76em;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.6px;
+            margin-bottom: 8px;
         }
 
         .logo-main {
             font-family: 'Outfit', sans-serif;
-            font-size: 3.4em;
+            font-size: clamp(2.2rem, 6.5vw, 3.3rem);
             font-weight: 800;
             color: var(--gold);
             text-shadow: 0 0 15px var(--glow-gold), 0 0 35px rgba(255, 215, 0, 0.25);
             text-decoration: none;
             display: inline-flex;
             align-items: baseline;
-            gap: 8px;
+            gap: 6px;
             letter-spacing: -0.5px;
-            transition: transform 0.3s ease;
-        }
-
-        .logo-main:hover {
-            transform: scale(1.02);
+            line-height: 1.1;
         }
 
         .logo-main span {
@@ -219,23 +259,25 @@
 
         .brand-subtitle {
             color: var(--silver);
-            font-size: 0.95em;
+            font-size: clamp(0.82rem, 2.5vw, 0.95rem);
             font-weight: 400;
-            letter-spacing: 0.5px;
+            letter-spacing: 0.3px;
+            line-height: 1.4;
+            max-width: 580px;
         }
 
         /* Centerpiece Status Card */
         .status-master-card {
             width: 100%;
-            max-width: 680px;
+            max-width: 650px;
             background: var(--card-bg);
-            border-radius: 22px;
-            padding: 38px 32px 32px;
+            border-radius: 20px;
+            padding: 30px 24px 26px;
             border: 1px solid rgba(255, 215, 0, 0.25);
             box-shadow: 0 20px 50px rgba(0, 0, 0, 0.7), 0 0 25px rgba(255, 215, 0, 0.12);
             backdrop-filter: blur(18px);
             -webkit-backdrop-filter: blur(18px);
-            margin-bottom: 35px;
+            margin-bottom: 30px;
             position: relative;
             overflow: hidden;
             transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
@@ -254,7 +296,7 @@
 
         .status-master-card.state-green {
             border-color: rgba(67, 160, 71, 0.4);
-            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.7), 0 0 30px rgba(67, 160, 71, 0.18);
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.7), 0 0 30px rgba(67, 160, 71, 0.2);
         }
         .status-master-card.state-green::before {
             background: linear-gradient(90deg, transparent, var(--green), transparent);
@@ -279,9 +321,9 @@
         /* Concentric Radar Orb Indicator */
         .radar-orb-wrapper {
             position: relative;
-            width: 90px;
-            height: 90px;
-            margin: 0 auto 20px;
+            width: clamp(72px, 18vw, 88px);
+            height: clamp(72px, 18vw, 88px);
+            margin: 0 auto 16px;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -309,15 +351,15 @@
         }
 
         .radar-orb-center {
-            width: 48px;
-            height: 48px;
+            width: clamp(42px, 10vw, 48px);
+            height: clamp(42px, 10vw, 48px);
             border-radius: 50%;
             background: #191b26;
             border: 2px solid var(--gold);
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 1.25em;
+            font-size: 1.15em;
             color: var(--gold);
             box-shadow: 0 0 16px var(--glow-gold);
             z-index: 2;
@@ -325,21 +367,11 @@
         }
 
         @keyframes radarPulse {
-            0% {
-                transform: scale(0.65);
-                opacity: 0.8;
-            }
-            70% {
-                transform: scale(1.15);
-                opacity: 0;
-            }
-            100% {
-                transform: scale(1.15);
-                opacity: 0;
-            }
+            0% { transform: scale(0.65); opacity: 0.8; }
+            70% { transform: scale(1.18); opacity: 0; }
+            100% { transform: scale(1.18); opacity: 0; }
         }
 
-        /* Radar colors based on server status */
         .state-green .radar-orb-center {
             border-color: var(--green);
             color: var(--green);
@@ -369,53 +401,57 @@
 
         .status-title-text {
             font-family: 'Outfit', sans-serif;
-            font-size: 1.6em;
+            font-size: clamp(1.28rem, 4vw, 1.65rem);
             font-weight: 700;
             margin-bottom: 8px;
             letter-spacing: -0.2px;
+            line-height: 1.25;
             transition: color 0.3s ease;
         }
 
         .status-desc-text {
             color: var(--silver);
-            font-size: 0.95em;
-            line-height: 1.6;
-            max-width: 540px;
-            margin: 0 auto 24px;
+            font-size: clamp(0.85rem, 2.5vw, 0.94rem);
+            line-height: 1.55;
+            max-width: 520px;
+            margin: 0 auto 20px;
         }
 
         /* Telemetry Metrology Strip */
         .metrology-strip {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
-            gap: 12px;
+            gap: 8px;
             background: rgba(14, 16, 24, 0.8);
             border: 1px solid var(--border-subtle);
             border-radius: 14px;
-            padding: 12px 16px;
-            margin-bottom: 25px;
+            padding: 10px 12px;
+            margin-bottom: 20px;
         }
 
         .metro-item {
             display: flex;
             flex-direction: column;
-            gap: 3px;
+            gap: 2px;
             text-align: center;
         }
 
         .metro-label {
-            font-size: 0.72em;
+            font-size: 0.7em;
             color: #8890a6;
             text-transform: uppercase;
-            letter-spacing: 0.5px;
+            letter-spacing: 0.4px;
             font-weight: 600;
         }
 
         .metro-val {
             font-family: 'Outfit', monospace;
-            font-size: 0.95em;
+            font-size: clamp(0.82rem, 2.5vw, 0.95rem);
             font-weight: 700;
             color: var(--white);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
 
         .metro-val.highlight-gold {
@@ -426,19 +462,117 @@
             color: var(--green);
         }
 
+        /* Live Automated & Manual Retry Controls Box */
+        .retry-controller-box {
+            background: rgba(12, 14, 22, 0.9);
+            border: 1px solid rgba(255, 215, 0, 0.2);
+            border-radius: 14px;
+            padding: 12px 14px;
+            margin-bottom: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .retry-top-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.78em;
+            color: var(--silver);
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+
+        .retry-status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            color: var(--gold);
+            font-weight: 600;
+        }
+
+        .retry-progress-track {
+            width: 100%;
+            height: 5px;
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 3px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .retry-progress-bar {
+            height: 100%;
+            width: 100%;
+            background: linear-gradient(90deg, var(--gold), #ffb700);
+            box-shadow: 0 0 8px var(--glow-gold);
+            transition: width 0.1s linear;
+        }
+
+        .retry-actions-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .retry-attempts-count {
+            font-size: 0.78em;
+            color: #8c93a8;
+            font-family: monospace;
+        }
+
+        .btn-manual-reping {
+            background: rgba(255, 215, 0, 0.12);
+            border: 1px solid var(--gold);
+            color: var(--gold);
+            padding: 7px 15px;
+            border-radius: 20px;
+            font-size: 0.8em;
+            font-weight: 700;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.2s ease;
+            box-shadow: 0 0 10px rgba(255, 215, 0, 0.15);
+            min-height: 36px;
+        }
+
+        .btn-manual-reping:hover:not(:disabled) {
+            background: var(--gold);
+            color: var(--black);
+            box-shadow: 0 0 16px var(--glow-gold);
+            transform: scale(1.02);
+        }
+
+        .btn-manual-reping:disabled {
+            opacity: 0.6;
+            cursor: wait;
+        }
+
         /* Primary Action Button */
+        .cta-btn-wrapper {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            width: 100%;
+            align-items: center;
+        }
+
         .btn-cta-main {
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            gap: 10px;
-            padding: 14px 34px;
+            gap: 8px;
+            padding: 13px 28px;
             background-color: var(--gold);
             color: var(--black);
             text-decoration: none;
             font-family: 'Outfit', sans-serif;
             font-weight: 700;
-            font-size: 1.08em;
+            font-size: 1.05em;
             border-radius: 30px;
             border: none;
             cursor: pointer;
@@ -446,47 +580,53 @@
             transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
             position: relative;
             overflow: hidden;
-            width: auto;
-            min-width: 260px;
+            width: 100%;
+            max-width: 380px;
+            min-height: 48px;
         }
 
         .btn-cta-main:hover {
-            transform: translateY(-3px) scale(1.02);
+            transform: translateY(-2px);
             box-shadow: 0 0 30px var(--glow-gold), 0 12px 30px rgba(0,0,0,0.6);
             color: var(--black);
         }
 
         .btn-cta-main:disabled {
-            background: #2a2e3d;
+            background: #232734;
             color: #7b8296;
             box-shadow: none;
             cursor: not-allowed;
             transform: none;
         }
 
-        /* Countdown Progress Indicator */
-        .countdown-progress-bar {
+        .btn-failover-secondary {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 7px;
+            padding: 10px 20px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border-subtle);
+            color: var(--silver);
+            text-decoration: none;
+            font-size: 0.84em;
+            font-weight: 600;
+            border-radius: 25px;
+            transition: all 0.2s ease;
             width: 100%;
-            height: 4px;
-            background: rgba(255, 255, 255, 0.08);
-            border-radius: 2px;
-            margin-top: 18px;
-            overflow: hidden;
-            display: none;
+            max-width: 380px;
         }
 
-        .countdown-progress-fill {
-            height: 100%;
-            width: 0%;
-            background: var(--gold);
-            box-shadow: 0 0 8px var(--glow-gold);
-            transition: width 0.1s linear;
+        .btn-failover-secondary:hover {
+            color: var(--gold);
+            border-color: var(--gold);
+            box-shadow: 0 0 12px var(--glow-gold);
         }
 
         /* Network Topology Hub */
         .network-section {
             width: 100%;
-            margin-bottom: 45px;
+            margin-bottom: 40px;
             text-align: left;
         }
 
@@ -494,18 +634,20 @@
             display: flex;
             align-items: center;
             justify-content: space-between;
-            margin-bottom: 18px;
-            padding: 0 4px;
+            margin-bottom: 14px;
+            padding: 0 2px;
+            flex-wrap: wrap;
+            gap: 6px;
         }
 
         .section-title-tag {
             font-family: 'Outfit', sans-serif;
-            font-size: 1.25em;
+            font-size: clamp(1.1rem, 3.5vw, 1.25rem);
             font-weight: 700;
             color: var(--white);
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 8px;
         }
 
         .section-title-tag i {
@@ -515,27 +657,25 @@
 
         .network-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 14px;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 12px;
         }
 
         .node-card {
             background: rgba(18, 20, 28, 0.75);
             border: 1px solid var(--border-subtle);
-            border-radius: 16px;
-            padding: 16px 18px;
+            border-radius: 14px;
+            padding: 14px 16px;
             display: flex;
             flex-direction: column;
-            justify-content: space-between;
-            gap: 10px;
+            gap: 8px;
             backdrop-filter: blur(10px);
-            transition: all 0.3s ease;
-            position: relative;
+            transition: all 0.25s ease;
         }
 
         .node-card:hover {
             border-color: rgba(255, 215, 0, 0.35);
-            transform: translateY(-3px);
+            transform: translateY(-2px);
             box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6), 0 0 12px rgba(255, 215, 0, 0.15);
         }
 
@@ -543,24 +683,26 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
+            gap: 8px;
         }
 
         .node-label {
-            font-size: 0.82em;
+            font-size: 0.78em;
             color: #8c93a8;
             font-weight: 600;
             text-transform: uppercase;
-            letter-spacing: 0.5px;
+            letter-spacing: 0.4px;
         }
 
         .node-badge {
-            font-size: 0.72em;
-            padding: 2px 8px;
-            border-radius: 10px;
+            font-size: 0.7em;
+            padding: 2px 7px;
+            border-radius: 8px;
             font-weight: 700;
             background: rgba(255, 215, 0, 0.12);
             color: var(--gold);
             border: 1px solid rgba(255, 215, 0, 0.25);
+            white-space: nowrap;
         }
 
         .node-badge.cyan {
@@ -581,18 +723,20 @@
             justify-content: space-between;
             gap: 8px;
             background: rgba(10, 11, 16, 0.7);
-            padding: 8px 12px;
-            border-radius: 10px;
+            padding: 7px 10px;
+            border-radius: 8px;
             border: 1px solid rgba(255, 255, 255, 0.04);
         }
 
         .node-value-text {
             font-family: monospace;
-            font-size: 0.88em;
+            font-size: 0.82em;
             color: var(--white);
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
+            min-width: 0;
+            flex: 1;
         }
 
         .node-copy-btn {
@@ -601,38 +745,50 @@
             color: var(--silver);
             cursor: pointer;
             font-size: 0.9em;
-            padding: 3px 6px;
+            padding: 5px;
             border-radius: 6px;
             transition: all 0.2s;
             flex-shrink: 0;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 32px;
+            min-height: 32px;
         }
 
         .node-copy-btn:hover {
             color: var(--gold);
-            transform: scale(1.15);
+            transform: scale(1.12);
         }
 
         /* ========================================================= */
-        /* FEATURED / VERIFIED MOD CARDS SHOWCASE                     */
-        /* (Matching views/partials/mod-card.ejs and public/css/style.css) */
+        /* POPULAR VERIFIED MODS SHOWCASE (MOBILE OPTIMIZED)          */
         /* ========================================================= */
         .featured-mods-section {
             width: 100%;
-            margin-bottom: 50px;
+            margin-bottom: 45px;
             text-align: left;
         }
 
-        .mods-showcase-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-            gap: 20px;
-            justify-items: center;
+        /* Horizontal Carousel on Mobile with Scroll-Snap, Grid on Desktop */
+        .mods-showcase-container {
+            display: flex;
+            overflow-x: auto;
+            scroll-snap-type: x mandatory;
+            gap: 14px;
+            padding: 6px 4px 18px;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: none;
         }
 
-        /* Enhanced Mod Card tweaks for the Showcase Grid */
-        .mods-showcase-grid .mod-card {
-            width: 100%;
-            max-width: 280px;
+        .mods-showcase-container::-webkit-scrollbar {
+            display: none;
+        }
+
+        .mods-showcase-container .mod-card {
+            flex: 0 0 240px;
+            scroll-snap-align: start;
+            width: 240px;
             background-color: var(--dark-gray);
             border: 1px solid #222;
             border-radius: 15px;
@@ -640,53 +796,71 @@
             position: relative;
             box-shadow: 0 8px 24px rgba(0,0,0,0.5);
             transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+            box-sizing: border-box;
         }
 
-        .mods-showcase-grid .mod-card:hover {
-            transform: translateY(-8px);
+        .mods-showcase-container .mod-card:hover,
+        .mods-showcase-container .mod-card.active-overlay {
+            transform: translateY(-6px);
             border-color: var(--gold);
             box-shadow: 0 10px 25px var(--glow-gold);
+        }
+
+        @media (min-width: 768px) {
+            .mods-showcase-container {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+                overflow-x: visible;
+                padding-bottom: 6px;
+            }
+            .mods-showcase-container .mod-card {
+                width: 100%;
+                flex: none;
+            }
         }
 
         /* Toast Copy Notification */
         .copy-toast {
             position: fixed;
-            bottom: 30px;
+            bottom: 24px;
+            left: 50%;
+            transform: translate(-50%, 20px);
             background: rgba(20, 22, 32, 0.95);
             border: 1px solid var(--gold);
             color: var(--gold);
-            padding: 10px 22px;
+            padding: 9px 20px;
             border-radius: 25px;
-            font-size: 0.88em;
+            font-size: 0.84em;
             font-weight: 600;
             box-shadow: 0 8px 25px rgba(0,0,0,0.8), 0 0 15px var(--glow-gold);
             backdrop-filter: blur(12px);
             opacity: 0;
-            transform: translateY(20px);
             pointer-events: none;
             transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
             z-index: 9999;
+            white-space: nowrap;
         }
 
         .copy-toast.show {
             opacity: 1;
-            transform: translateY(0);
+            transform: translate(-50%, 0);
         }
 
         /* Footer */
         .gateway-footer {
             margin-top: auto;
-            padding: 24px 20px;
+            padding: 20px 16px;
             color: #7b8296;
-            font-size: 0.82em;
+            font-size: 0.78em;
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 15px;
+            gap: 12px;
             flex-wrap: wrap;
             border-top: 1px solid var(--border-subtle);
             width: 100%;
-            max-width: 1140px;
+            max-width: 1100px;
+            text-align: center;
         }
 
         .gateway-footer a {
@@ -698,61 +872,40 @@
         .gateway-footer a:hover {
             color: var(--gold);
         }
-
-        @media (max-width: 768px) {
-            .gateway-top-bar {
-                flex-direction: column;
-                gap: 12px;
-                padding: 15px;
-            }
-            .logo-main {
-                font-size: 2.6em;
-            }
-            .status-master-card {
-                padding: 26px 18px 22px;
-            }
-            .metrology-strip {
-                grid-template-columns: 1fr;
-                gap: 8px;
-            }
-            .network-grid {
-                grid-template-columns: 1fr;
-            }
-            .btn-cta-main {
-                width: 100%;
-            }
-        }
     </style>
 </head>
 <body>
 
     <!-- Ambient backdrop glow orbs -->
-    <div class="ambient-glow glow-top-left" id="ambientGlowTop"></div>
-    <div class="ambient-glow glow-bottom-right" id="ambientGlowBottom"></div>
+    <div class="ambient-glow glow-top-left"></div>
+    <div class="ambient-glow glow-bottom-right"></div>
 
     <!-- TOP TELEMETRY BAR -->
     <header class="gateway-top-bar">
         <div class="telemetry-chip-group">
             <div class="telemetry-chip" id="topStatusChip">
                 <span class="status-dot-pulse yellow" id="topStatusDot"></span>
-                <span id="topStatusText">Checking Origin Cluster...</span>
+                <span id="topStatusText">Checking Cluster...</span>
             </div>
-            <div class="telemetry-chip" title="Measured Latency">
+            
+            <div class="telemetry-chip" title="Live Measured Latency">
                 <i class="fas fa-bolt" style="color: var(--gold); font-size: 0.85em;"></i>
                 <span id="topLatencyBadge">-- ms</span>
             </div>
-            <div class="telemetry-chip" title="Cloudflare CDN Edge">
-                <i class="fas fa-globe" style="color: var(--cyan); font-size: 0.85em;"></i>
-                <span>Global Edge</span>
+
+            <!-- Lipis Flag Icon Component -->
+            <div class="telemetry-chip" id="topRegionChip" title="Detected Geographic Gateway">
+                <span class="fi fi-in" id="topRegionFlag"></span>
+                <span id="topRegionName">India</span>
             </div>
         </div>
 
         <div class="header-actions">
-            <button class="btn-header-reping" onclick="checkServerStatus(true)" title="Instant Re-Check">
-                <i class="fas fa-sync-alt" id="repingIcon"></i> Re-Ping
+            <button class="btn-header-action" id="headerRepingBtn" onclick="manualPingTrigger()" title="Test Live Ping">
+                <i class="fas fa-sync-alt" id="headerRepingIcon"></i> Ping
             </button>
-            <a href="https://gplmods.webredirect.org" class="btn-header-reping" target="_blank" title="Open Main Link">
-                <i class="fas fa-external-link-alt"></i> Portal
+            <a href="https://gplmods.mytunnel.org" class="btn-header-action" target="_blank" title="Anti-Revoke Archive DNS">
+                <i class="fas fa-shield-alt" style="color: var(--gold);"></i> Mirror
             </a>
         </div>
     </header>
@@ -760,17 +913,20 @@
     <!-- MAIN DASHBOARD CONTAINER -->
     <div class="gateway-container">
         
-        <!-- BRANDING -->
+        <!-- BRANDING & SERVICE UNAVAILABLE NOTICE -->
         <div class="brand-header">
+            <div class="temporary-notice-pill">
+                <i class="fas fa-satellite-dish fa-spin" style="animation-duration: 3s;"></i> Service Gateway & Failover System
+            </div>
             <a href="https://gplmods.webredirect.org" class="logo-main">
                 GPL <span>Mods</span>
             </a>
             <p class="brand-subtitle">
-                High-Availability Cloud Edge & System Telemetry Gateway
+                Main service is temporarily asleep or recovering. Our automated engine will boot and reconnect you seamlessly.
             </p>
         </div>
 
-        <!-- CENTERPIECE STATUS CARD -->
+        <!-- CENTERPIECE STATUS & RECOVERY CARD -->
         <div class="status-master-card state-yellow" id="statusCard">
             
             <!-- Holographic Radar Orb -->
@@ -778,53 +934,76 @@
                 <div class="radar-ring outer"></div>
                 <div class="radar-ring middle"></div>
                 <div class="radar-orb-center" id="radarCenterIcon">
-                    <i class="fas fa-satellite-dish fa-spin" style="animation-duration: 4s;"></i>
+                    <i class="fas fa-power-off fa-spin" style="animation-duration: 3s;"></i>
                 </div>
             </div>
 
             <!-- Status Headings -->
             <h2 class="status-title-text" id="statusTitle" style="color: var(--gold);">
-                Establishing Handshake...
+                Service Temporarily Sleeping
             </h2>
 
             <p class="status-desc-text" id="statusDesc">
-                Please wait while we establish a secure telemetry handshake with the main GPL Mods cluster.
+                Because we operate on a scalable cloud cluster, the origin server spins down during low traffic. <strong>It is currently waking up.</strong> Please stand by while automated recovery verifies the container.
             </p>
 
-            <!-- Metrology Strip -->
+            <!-- Metrology Strip (Live Metrology Data) -->
             <div class="metrology-strip">
                 <div class="metro-item">
-                    <span class="metro-label">Roundtrip Latency</span>
+                    <span class="metro-label">Measured Latency</span>
                     <span class="metro-val highlight-gold" id="metroLatency">-- ms</span>
                 </div>
                 <div class="metro-item">
-                    <span class="metro-label">Gateway Response</span>
+                    <span class="metro-label">HTTP Response</span>
                     <span class="metro-val" id="metroHttp">Pinging...</span>
                 </div>
                 <div class="metro-item">
                     <span class="metro-label">Origin Pipeline</span>
-                    <span class="metro-val" id="metroPipeline">Render Anycast</span>
+                    <span class="metro-val" id="metroPipeline">Render Container</span>
                 </div>
             </div>
 
-            <!-- Main CTA Button -->
-            <button id="mainActionBtn" class="btn-cta-main" disabled>
-                <i class="fas fa-spinner fa-spin"></i> Establishing Connection...
-            </button>
+            <!-- Automated & Manual Ping Retry Box -->
+            <div class="retry-controller-box" id="retryBox">
+                <div class="retry-top-meta">
+                    <div class="retry-status-badge">
+                        <i class="fas fa-clock"></i>
+                        <span id="retryCountdownText">Next auto-ping in: 5s</span>
+                    </div>
+                    <span id="lastPingTimestamp" style="color: #8c93a8; font-size: 0.9em;">Last checked: Just now</span>
+                </div>
 
-            <!-- Countdown Bar (Active when Green) -->
-            <div class="countdown-progress-bar" id="countdownContainer">
-                <div class="countdown-progress-fill" id="countdownFill"></div>
+                <div class="retry-progress-track">
+                    <div class="retry-progress-bar" id="retryProgressBar" style="width: 100%;"></div>
+                </div>
+
+                <div class="retry-actions-row">
+                    <span class="retry-attempts-count" id="attemptCountDisplay">Recovery Attempt: #1 (0s elapsed)</span>
+                    <button class="btn-manual-reping" id="manualRetryBtn" onclick="manualPingTrigger()">
+                        <i class="fas fa-sync-alt" id="manualRetryIcon"></i> Retry Ping Now
+                    </button>
+                </div>
             </div>
+
+            <!-- Action Buttons -->
+            <div class="cta-btn-wrapper">
+                <button id="mainActionBtn" class="btn-cta-main" disabled>
+                    <i class="fas fa-spinner fa-spin"></i> Booting Origin Container...
+                </button>
+                <a href="https://gplmods.mytunnel.org" class="btn-failover-secondary" id="failoverBtn">
+                    <i class="fas fa-shield-alt" style="color: var(--gold);"></i> Switch to Anti-Revoke Archive DNS
+                </a>
+            </div>
+
         </div>
 
-        <!-- NETWORK TOPOLOGY HUB -->
+        <!-- NETWORK INFRASTRUCTURE TOPOLOGY HUB -->
         <section class="network-section">
             <div class="section-header-row">
                 <h3 class="section-title-tag">
-                    <i class="fas fa-network-wired"></i> Network Infrastructure Topology
+                    <i class="fas fa-network-wired"></i> Redundant Network Infrastructure
                 </h3>
-                <span style="font-size: 0.8em; color: var(--silver);"><i class="fas fa-shield-alt" style="color: var(--gold);"></i> Redundant Anycast</span>
+                <span style="font-size: 0.76em; color: var(--silver);"><i class="fas fa-shield-check" style="color: var(--gold);"></i> TLS 1.3 Active</span>
             </div>
 
             <div class="network-grid">
@@ -832,25 +1011,25 @@
                 <!-- Node 1: Main Gateway -->
                 <div class="node-card">
                     <div class="node-header">
-                        <span class="node-label">Primary Gateway</span>
-                        <span class="node-badge green">Online</span>
+                        <span class="node-label">Primary Cloud Gateway</span>
+                        <span class="node-badge" id="node1Badge">Auto-Recovering</span>
                     </div>
                     <div class="node-value-box">
-                        <span class="node-value-text" id="node-val-1">https://gplmods.webredirect.org</span>
+                        <span class="node-value-text">https://gplmods.webredirect.org</span>
                         <button class="node-copy-btn" onclick="copyNodeText('https://gplmods.webredirect.org')" title="Copy URL">
                             <i class="fas fa-copy"></i>
                         </button>
                     </div>
                 </div>
 
-                <!-- Node 2: Archive DNS -->
+                <!-- Node 2: Archive DNS Mirror -->
                 <div class="node-card">
                     <div class="node-header">
                         <span class="node-label">Anti-Revoke Archive DNS</span>
-                        <span class="node-badge">Failover Mirror</span>
+                        <span class="node-badge green">Always Active</span>
                     </div>
                     <div class="node-value-box">
-                        <span class="node-value-text" id="node-val-2">https://gplmods.mytunnel.org</span>
+                        <span class="node-value-text">https://gplmods.mytunnel.org</span>
                         <button class="node-copy-btn" onclick="copyNodeText('https://gplmods.mytunnel.org')" title="Copy URL">
                             <i class="fas fa-copy"></i>
                         </button>
@@ -860,11 +1039,11 @@
                 <!-- Node 3: Render Origin Subnets -->
                 <div class="node-card">
                     <div class="node-header">
-                        <span class="node-label">Render Origin Subnet</span>
-                        <span class="node-badge cyan">Anycast IPv4</span>
+                        <span class="node-label">Render Origin Anycast</span>
+                        <span class="node-badge cyan">IPv4 Cluster</span>
                     </div>
                     <div class="node-value-box">
-                        <span class="node-value-text" id="node-val-3">74.220.52.0/24 | 74.220.60.0/24</span>
+                        <span class="node-value-text">74.220.52.0/24 | 74.220.60.0/24</span>
                         <button class="node-copy-btn" onclick="copyNodeText('74.220.52.0/24 | 74.220.60.0/24')" title="Copy Subnets">
                             <i class="fas fa-copy"></i>
                         </button>
@@ -875,25 +1054,11 @@
                 <div class="node-card">
                     <div class="node-header">
                         <span class="node-label">Edge CDN Proxy</span>
-                        <span class="node-badge cyan">Edge Cache</span>
+                        <span class="node-badge cyan">Global Cache</span>
                     </div>
                     <div class="node-value-box">
-                        <span class="node-value-text" id="node-val-4">cdn.gplmodsofficial.workers.dev</span>
+                        <span class="node-value-text">cdn.gplmodsofficial.workers.dev</span>
                         <button class="node-copy-btn" onclick="copyNodeText('cdn.gplmodsofficial.workers.dev')" title="Copy Edge">
-                            <i class="fas fa-copy"></i>
-                        </button>
-                    </div>
-                </div>
-
-                <!-- Node 5: Static Failback Host -->
-                <div class="node-card">
-                    <div class="node-header">
-                        <span class="node-label">Failback Static Host</span>
-                        <span class="node-badge">Disaster Backup</span>
-                    </div>
-                    <div class="node-value-box">
-                        <span class="node-value-text" id="node-val-5">gplmods.great-site.net</span>
-                        <button class="node-copy-btn" onclick="copyNodeText('gplmods.great-site.net')" title="Copy Host">
                             <i class="fas fa-copy"></i>
                         </button>
                     </div>
@@ -909,17 +1074,15 @@
         <section class="featured-mods-section">
             <div class="section-header-row">
                 <h3 class="section-title-tag">
-                    <i class="fas fa-fire"></i> Trending Verified Releases
+                    <i class="fas fa-fire"></i> Popular Verified Releases
                 </h3>
-                <a href="https://gplmods.webredirect.org" target="_blank" style="color: var(--gold); text-decoration: none; font-size: 0.85em; font-weight: 600;">
-                    Explore All <i class="fas fa-arrow-right"></i>
-                </a>
+                <span style="font-size: 0.78em; color: var(--silver);"><i class="fas fa-arrows-left-right" style="margin-right: 4px;"></i> Swipe to browse</span>
             </div>
 
-            <div class="mods-showcase-grid">
+            <div class="mods-showcase-container">
 
                 <!-- 1. Roblox Delta -->
-                <div class="mod-card">
+                <div class="mod-card" onclick="toggleModOverlay(this)">
                     <div class="card-top-badges">
                         <div class="app-feature-tag"><i class="fas fa-check-circle" style="font-size: 0.85em; margin-right: 4px;"></i> Certified</div>
                         <div class="mod-type-tag">v2.604</div>
@@ -955,7 +1118,7 @@
                 </div>
 
                 <!-- 2. Kinemaster Pro -->
-                <div class="mod-card">
+                <div class="mod-card" onclick="toggleModOverlay(this)">
                     <div class="card-top-badges">
                         <div class="app-feature-tag"><i class="fas fa-check-circle" style="font-size: 0.85em; margin-right: 4px;"></i> Certified</div>
                         <div class="mod-type-tag">v7.3</div>
@@ -991,7 +1154,7 @@
                 </div>
 
                 <!-- 3. Elementor Pro -->
-                <div class="mod-card">
+                <div class="mod-card" onclick="toggleModOverlay(this)">
                     <div class="card-top-badges">
                         <div class="app-feature-tag" style="background-color: var(--silver); color: var(--black);">Community Tested</div>
                         <div class="mod-type-tag">v3.15</div>
@@ -1027,7 +1190,7 @@
                 </div>
 
                 <!-- 4. Fortnite Mobile -->
-                <div class="mod-card">
+                <div class="mod-card" onclick="toggleModOverlay(this)">
                     <div class="card-top-badges">
                         <div class="app-feature-tag"><i class="fas fa-check-circle" style="font-size: 0.85em; margin-right: 4px;"></i> Certified</div>
                         <div class="mod-type-tag">v29.10</div>
@@ -1074,134 +1237,236 @@
 
     <!-- FOOTER -->
     <footer class="gateway-footer">
-        <span>&copy; 2026 GPL Mods Official. All Rights Reserved.</span>
+        <span>&copy; 2026 GPL Mods Official. All Systems Monitored.</span>
         <span>&bull;</span>
-        <a href="https://gplmods.webredirect.org" target="_blank">Main Portal</a>
+        <a href="https://gplmods.webredirect.org" target="_blank">Main Site</a>
         <span>&bull;</span>
         <a href="https://gplmods.mytunnel.org" target="_blank">Archive DNS</a>
         <span>&bull;</span>
         <a href="https://t.me/gplmods" target="_blank"><i class="fab fa-telegram"></i> Telegram Community</a>
     </footer>
 
-    <!-- REAL-TIME TELEMETRY SCRIPT -->
+    <!-- REAL-TIME TELEMETRY SCRIPT (AUTOMATED & MANUAL PING ENGINE) -->
     <script>
+        // 1. CONFIGURATION & URL RESOLUTION
         const urlParams = new URLSearchParams(window.location.search);
         const MAIN_URL = urlParams.get('host') || 'https://gplmods.webredirect.org';
         const HEALTH_ENDPOINT = MAIN_URL + '/healthz';
+        const CUSTOM_FLAG_PARAM = urlParams.get('flag') || urlParams.get('country');
 
+        // 2. LIPIS FLAG ICONS DETECTION (SYNCED WITH MAIN SITE)
+        const COUNTRY_MAP = {
+            'in': { code: 'in', name: 'India' },
+            'hi': { code: 'in', name: 'India' },
+            'us': { code: 'us', name: 'United States' },
+            'en': { code: 'us', name: 'Global Edge' },
+            'gb': { code: 'gb', name: 'United Kingdom' },
+            'uk': { code: 'gb', name: 'United Kingdom' },
+            'es': { code: 'es', name: 'Spain' },
+            'fr': { code: 'fr', name: 'France' },
+            'de': { code: 'de', name: 'Germany' },
+            'br': { code: 'br', name: 'Brazil' },
+            'pt': { code: 'br', name: 'Portugal/Brazil' },
+            'ru': { code: 'ru', name: 'Russia' },
+            'sa': { code: 'sa', name: 'Saudi Arabia' },
+            'ae': { code: 'ae', name: 'UAE' },
+            'ar': { code: 'sa', name: 'Middle East' },
+            'jp': { code: 'jp', name: 'Japan' },
+            'ja': { code: 'jp', name: 'Japan' }
+        };
+
+        function setupLipisRegion() {
+            let active = { code: 'in', name: 'India' };
+            if (CUSTOM_FLAG_PARAM) {
+                const key = CUSTOM_FLAG_PARAM.toLowerCase();
+                active = COUNTRY_MAP[key] || { code: 'un', name: CUSTOM_FLAG_PARAM };
+            } else {
+                const browserLang = (navigator.language || navigator.userLanguage || 'en-US').toLowerCase();
+                const parts = browserLang.split('-');
+                const lang = parts[0];
+                const region = parts[1] || '';
+                if (region && COUNTRY_MAP[region]) active = COUNTRY_MAP[region];
+                else if (COUNTRY_MAP[lang]) active = COUNTRY_MAP[lang];
+            }
+
+            const flagEl = document.getElementById('topRegionFlag');
+            const nameEl = document.getElementById('topRegionName');
+            if (flagEl) flagEl.className = `fi fi-${active.code}`;
+            if (nameEl) nameEl.textContent = active.name;
+        }
+
+        // 3. UI ELEMENT REFERENCES
         const statusCard = document.getElementById('statusCard');
         const radarCenterIcon = document.getElementById('radarCenterIcon');
         const statusTitle = document.getElementById('statusTitle');
         const statusDesc = document.getElementById('statusDesc');
         const mainActionBtn = document.getElementById('mainActionBtn');
-        const repingIcon = document.getElementById('repingIcon');
+        const failoverBtn = document.getElementById('failoverBtn');
 
-        const topStatusChip = document.getElementById('topStatusChip');
         const topStatusDot = document.getElementById('topStatusDot');
         const topStatusText = document.getElementById('topStatusText');
         const topLatencyBadge = document.getElementById('topLatencyBadge');
+        const headerRepingBtn = document.getElementById('headerRepingBtn');
+        const headerRepingIcon = document.getElementById('headerRepingIcon');
 
         const metroLatency = document.getElementById('metroLatency');
         const metroHttp = document.getElementById('metroHttp');
         const metroPipeline = document.getElementById('metroPipeline');
 
-        const countdownContainer = document.getElementById('countdownContainer');
-        const countdownFill = document.getElementById('countdownFill');
+        const retryBox = document.getElementById('retryBox');
+        const retryCountdownText = document.getElementById('retryCountdownText');
+        const retryProgressBar = document.getElementById('retryProgressBar');
+        const lastPingTimestamp = document.getElementById('lastPingTimestamp');
+        const attemptCountDisplay = document.getElementById('attemptCountDisplay');
+        const manualRetryBtn = document.getElementById('manualRetryBtn');
+        const manualRetryIcon = document.getElementById('manualRetryIcon');
+
+        const node1Badge = document.getElementById('node1Badge');
         const copyToast = document.getElementById('copyToast');
 
+        // 4. RETRY ENGINE STATE
+        const RETRY_INTERVAL_SECONDS = 5;
+        let retrySecondsLeft = RETRY_INTERVAL_SECONDS;
+        let countdownTimerId = null;
+        let isPingInProgress = false;
+        let attemptCount = 0;
+        let sessionStartTime = Date.now();
         let redirectTimer = null;
-        let wakePollingInterval = null;
-        let wakeStartTime = null;
 
-        function setStatus(state, latencyMs = 0) {
+        function formatClockTime(date) {
+            const h = String(date.getHours()).padStart(2, '0');
+            const m = String(date.getMinutes()).padStart(2, '0');
+            const s = String(date.getSeconds()).padStart(2, '0');
+            return `${h}:${m}:${s}`;
+        }
+
+        // 5. LIVE STATUS DISPATCHER
+        function setStatus(state, latencyMs = 0, httpCode = '') {
             statusCard.className = `status-master-card state-${state}`;
+            const elapsedTotalSec = Math.round((Date.now() - sessionStartTime) / 1000);
+            if (lastPingTimestamp) {
+                lastPingTimestamp.textContent = `Last ping: ${formatClockTime(new Date())}`;
+            }
 
             if (state === 'green') {
+                // Online & Fully Operational
+                stopAutoRetryTimer();
                 topStatusDot.className = 'status-dot-pulse green';
-                topStatusText.textContent = 'Cluster Online & Active';
+                topStatusText.textContent = 'Cluster Online & Ready';
                 topLatencyBadge.textContent = `${latencyMs} ms`;
 
                 metroLatency.textContent = `${latencyMs} ms`;
                 metroLatency.className = 'metro-val highlight-green';
-                metroHttp.textContent = 'HTTP 200 OK';
+                metroHttp.textContent = httpCode || 'HTTP 200 OK';
                 metroPipeline.textContent = 'Render Active';
 
                 radarCenterIcon.innerHTML = '<i class="fas fa-check"></i>';
-                statusTitle.innerText = 'Cluster Online & Fully Active';
+                statusTitle.innerText = 'Service Restored & Online!';
                 statusTitle.style.color = 'var(--green)';
-                statusDesc.innerHTML = 'The origin Render node is responding with optimal latency. Handshake established successfully.';
+                statusDesc.innerHTML = 'The origin Render node responded with optimal latency. Handshake confirmed. Redirecting you to the portal...';
+
+                if (node1Badge) {
+                    node1Badge.className = 'node-badge green';
+                    node1Badge.textContent = 'Active (200 OK)';
+                }
+
+                if (retryBox) retryBox.style.display = 'none';
 
                 mainActionBtn.innerHTML = 'Enter GPL Mods <i class="fas fa-arrow-right"></i>';
                 mainActionBtn.disabled = false;
                 mainActionBtn.style.backgroundColor = 'var(--gold)';
                 mainActionBtn.style.color = 'var(--black)';
-                mainActionBtn.style.boxShadow = '0 0 20px var(--glow-gold), 0 8px 25px rgba(0,0,0,0.5)';
+                mainActionBtn.style.boxShadow = '0 0 25px var(--glow-gold)';
                 mainActionBtn.onclick = () => window.location.href = MAIN_URL;
 
-                // Start 4-second auto redirect countdown
-                startCountdown(4);
+                // Start 3-second auto redirect
+                startRedirectCountdown(3);
 
             } else if (state === 'yellow') {
+                // Temporary Unavailable / Waking Up
                 topStatusDot.className = 'status-dot-pulse yellow';
                 topStatusText.textContent = 'Waking Origin Server...';
                 topLatencyBadge.textContent = latencyMs > 0 ? `${latencyMs} ms` : 'Booting...';
 
-                metroLatency.textContent = latencyMs > 0 ? `${latencyMs} ms` : 'Waking...';
+                metroLatency.textContent = latencyMs > 0 ? `${latencyMs} ms` : 'Booting...';
                 metroLatency.className = 'metro-val highlight-gold';
-                metroHttp.textContent = 'HTTP Booting';
+                metroHttp.textContent = httpCode || 'Waking Up';
                 metroPipeline.textContent = 'Spinning Container';
 
-                radarCenterIcon.innerHTML = '<i class="fas fa-power-off fa-spin"></i>';
-                statusTitle.innerText = 'Server Spinning Up...';
+                radarCenterIcon.innerHTML = '<i class="fas fa-power-off fa-spin" style="animation-duration: 3s;"></i>';
+                statusTitle.innerText = 'Service Temporarily Sleeping';
                 statusTitle.style.color = 'var(--gold)';
-                statusDesc.innerHTML = 'Because Render spins down free containers during periods of low activity, the instance is waking up. <strong>This typically completes in 30 to 50 seconds.</strong> We will automatically redirect you once ready.';
+                statusDesc.innerHTML = 'The server instance sleeps to conserve free-tier resources and is currently booting up. <strong>This usually takes 30 to 50 seconds.</strong> Automated recovery will reconnect you as soon as it wakes.';
 
-                if (!wakeStartTime) wakeStartTime = Date.now();
-                const elapsedSec = Math.round((Date.now() - wakeStartTime) / 1000);
+                if (node1Badge) {
+                    node1Badge.className = 'node-badge';
+                    node1Badge.textContent = 'Booting Node';
+                }
 
-                mainActionBtn.innerHTML = `<i class="fas fa-spinner fa-spin"></i> Booting Container (${elapsedSec}s)...`;
+                mainActionBtn.innerHTML = `<i class="fas fa-spinner fa-spin"></i> Waking Instance (${elapsedTotalSec}s elapsed)...`;
                 mainActionBtn.disabled = true;
 
-                // Re-poll every 5 seconds until green
-                clearTimeout(wakePollingInterval);
-                wakePollingInterval = setTimeout(() => checkServerStatus(false), 5000);
+                // Keep retry box visible and restart countdown
+                if (retryBox) retryBox.style.display = 'flex';
+                startAutoRetryCountdown();
 
             } else if (state === 'red') {
+                // Unreachable or Timeout
                 topStatusDot.className = 'status-dot-pulse red';
-                topStatusText.textContent = 'Origin Unreachable';
-                topLatencyBadge.textContent = 'Timeout';
+                topStatusText.textContent = 'Origin Delayed';
+                topLatencyBadge.textContent = latencyMs > 0 ? `${latencyMs} ms` : 'Timeout';
 
-                metroLatency.textContent = 'N/A';
+                metroLatency.textContent = latencyMs > 0 ? `${latencyMs} ms` : 'Timed Out';
                 metroLatency.className = 'metro-val';
-                metroHttp.textContent = 'Connection Err';
-                metroPipeline.textContent = 'Failover DNS';
+                metroHttp.textContent = httpCode || 'No Response';
+                metroPipeline.textContent = 'Retrying Route';
 
-                radarCenterIcon.innerHTML = '<i class="fas fa-shield-alt"></i>';
-                statusTitle.innerText = 'Origin Delayed — Use Mirror';
+                radarCenterIcon.innerHTML = '<i class="fas fa-exclamation-triangle"></i>';
+                statusTitle.innerText = 'Service Temporarily Unavailable';
                 statusTitle.style.color = 'var(--red)';
-                statusDesc.innerHTML = 'The primary Render gateway did not respond within the allocated threshold. You can instantly access the catalog via our Anti-Revoke Archive DNS mirror.';
+                statusDesc.innerHTML = 'The origin gateway did not respond within the latency threshold. Retrying automatically, or you can switch to our high-availability Anti-Revoke Archive DNS.';
+
+                if (node1Badge) {
+                    node1Badge.className = 'node-badge';
+                    node1Badge.textContent = 'Unreachable';
+                }
 
                 mainActionBtn.innerHTML = '<i class="fas fa-shield-alt"></i> Connect to Archive DNS';
                 mainActionBtn.disabled = false;
                 mainActionBtn.style.backgroundColor = 'var(--red)';
                 mainActionBtn.style.color = 'var(--white)';
-                mainActionBtn.style.boxShadow = '0 0 20px var(--glow-red), 0 8px 25px rgba(0,0,0,0.5)';
+                mainActionBtn.style.boxShadow = '0 0 20px var(--glow-red)';
                 mainActionBtn.onclick = () => window.location.href = 'https://gplmods.mytunnel.org';
+
+                if (retryBox) retryBox.style.display = 'flex';
+                startAutoRetryCountdown();
             }
         }
 
-        async function checkServerStatus(isManual = false) {
-            if (isManual && repingIcon) {
-                repingIcon.classList.add('fa-spin');
+        // 6. LIVE PING ENGINE (ACTUAL FETCH TO /healthz)
+        async function performLivePing() {
+            if (isPingInProgress) return;
+            isPingInProgress = true;
+            attemptCount++;
+
+            // Visual feedback on buttons
+            if (manualRetryBtn) manualRetryBtn.disabled = true;
+            if (manualRetryIcon) manualRetryIcon.classList.add('fa-spin');
+            if (headerRepingIcon) headerRepingIcon.classList.add('fa-spin');
+
+            const elapsedTotalSec = Math.round((Date.now() - sessionStartTime) / 1000);
+            if (attemptCountDisplay) {
+                attemptCountDisplay.textContent = `Recovery Attempt: #${attemptCount} (${elapsedTotalSec}s elapsed)`;
             }
 
             const startTime = Date.now();
             const controller = new AbortController();
-            const timeoutId = setTimeout(() => controller.abort(), 12000); // 12 second threshold
+            const timeoutThreshold = 12000; // 12 seconds
+            const timeoutId = setTimeout(() => controller.abort(), timeoutThreshold);
 
             try {
-                const response = await fetch(HEALTH_ENDPOINT, { 
-                    method: 'GET', 
+                const response = await fetch(HEALTH_ENDPOINT, {
+                    method: 'GET',
                     signal: controller.signal,
                     cache: 'no-store'
                 });
@@ -1209,84 +1474,128 @@
                 clearTimeout(timeoutId);
                 const responseTime = Date.now() - startTime;
 
-                if (isManual && repingIcon) {
-                    setTimeout(() => repingIcon.classList.remove('fa-spin'), 600);
-                }
-
                 if (response.ok || response.type === 'opaque') {
                     if (responseTime > 3500) {
-                        setStatus('yellow', responseTime);
+                        setStatus('yellow', responseTime, `HTTP ${response.status || '200'}`);
                     } else {
-                        setStatus('green', responseTime);
+                        setStatus('green', responseTime, `HTTP ${response.status || '200'} OK`);
                     }
                 } else {
-                    setStatus('red');
+                    setStatus('yellow', responseTime, `HTTP ${response.status}`);
                 }
-            } catch (error) {
+            } catch (err) {
                 clearTimeout(timeoutId);
-                if (isManual && repingIcon) {
-                    setTimeout(() => repingIcon.classList.remove('fa-spin'), 600);
-                }
+                const responseTime = Date.now() - startTime;
 
-                if (error.name === 'AbortError') {
-                    setStatus('yellow');
+                if (err.name === 'AbortError') {
+                    // Timed out (Render container is still spinning up)
+                    setStatus('yellow', responseTime, 'Booting (Timed Out)');
                 } else {
-                    setStatus('red');
+                    setStatus('red', responseTime, 'Network Timeout');
                 }
+            } finally {
+                isPingInProgress = false;
+                if (manualRetryBtn) manualRetryBtn.disabled = false;
+                if (manualRetryIcon) manualRetryIcon.classList.remove('fa-spin');
+                if (headerRepingIcon) headerRepingIcon.classList.remove('fa-spin');
             }
         }
 
-        function startCountdown(seconds) {
-            if (!countdownContainer || !countdownFill) return;
-            countdownContainer.style.display = 'block';
+        // 7. AUTOMATED PING RETRY COUNTDOWN TIMER
+        function startAutoRetryCountdown() {
+            stopAutoRetryTimer();
+            retrySecondsLeft = RETRY_INTERVAL_SECONDS;
 
-            let remaining = seconds;
-            const stepMs = 50;
-            const totalSteps = (seconds * 1000) / stepMs;
-            let currentStep = 0;
+            function updateTick() {
+                if (retryCountdownText) {
+                    retryCountdownText.textContent = `Next auto-ping in: ${retrySecondsLeft}s`;
+                }
+                if (retryProgressBar) {
+                    const pct = (retrySecondsLeft / RETRY_INTERVAL_SECONDS) * 100;
+                    retryProgressBar.style.width = `${pct}%`;
+                }
+            }
 
-            clearInterval(redirectTimer);
+            updateTick();
+
+            countdownTimerId = setInterval(() => {
+                retrySecondsLeft--;
+                updateTick();
+
+                if (retrySecondsLeft <= 0) {
+                    stopAutoRetryTimer();
+                    performLivePing();
+                }
+            }, 1000);
+        }
+
+        function stopAutoRetryTimer() {
+            if (countdownTimerId) {
+                clearInterval(countdownTimerId);
+                countdownTimerId = null;
+            }
+        }
+
+        // 8. MANUAL PING TRIGGER
+        function manualPingTrigger() {
+            stopAutoRetryTimer();
+            performLivePing();
+        }
+
+        // 9. REDIRECT COUNTDOWN WHEN ONLINE
+        function startRedirectCountdown(seconds) {
+            let left = seconds;
+            if (redirectTimer) clearInterval(redirectTimer);
+
             redirectTimer = setInterval(() => {
-                currentStep++;
-                const pct = (currentStep / totalSteps) * 100;
-                countdownFill.style.width = `${pct}%`;
-
-                if (currentStep >= totalSteps) {
+                left--;
+                if (mainActionBtn) {
+                    mainActionBtn.innerHTML = `Redirecting in ${left}s... <i class="fas fa-arrow-right"></i>`;
+                }
+                if (left <= 0) {
                     clearInterval(redirectTimer);
                     window.location.href = MAIN_URL;
                 }
-            }, stepMs);
+            }, 1000);
         }
 
+        // 10. COPY CLIPBOARD HELPER
         function copyNodeText(text) {
             if (navigator.clipboard && window.isSecureContext) {
                 navigator.clipboard.writeText(text).then(showToast);
             } else {
-                const textArea = document.createElement("textarea");
-                textArea.value = text;
-                textArea.style.position = "fixed";
-                textArea.style.left = "-999999px";
-                document.body.appendChild(textArea);
-                textArea.focus();
-                textArea.select();
+                const ta = document.createElement("textarea");
+                ta.value = text;
+                ta.style.position = "fixed";
+                ta.style.left = "-9999px";
+                document.body.appendChild(ta);
+                ta.focus();
+                ta.select();
                 try {
                     document.execCommand('copy');
                     showToast();
-                } catch (err) {}
-                document.body.removeChild(textArea);
+                } catch (e) {}
+                document.body.removeChild(ta);
             }
         }
 
         function showToast() {
             if (!copyToast) return;
             copyToast.classList.add('show');
-            setTimeout(() => {
-                copyToast.classList.remove('show');
-            }, 2500);
+            setTimeout(() => copyToast.classList.remove('show'), 2400);
         }
 
+        // 11. MOBILE MOD CARD OVERLAY TOGGLE
+        function toggleModOverlay(cardEl) {
+            if (window.innerWidth < 768) {
+                cardEl.classList.toggle('active-overlay');
+            }
+        }
+
+        // 12. INITIALIZE ON DOM LOAD
         document.addEventListener('DOMContentLoaded', () => {
-            checkServerStatus(false);
+            setupLipisRegion();
+            performLivePing();
         });
     </script>
 </body>

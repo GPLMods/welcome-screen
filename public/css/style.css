@@ -146,9 +146,13 @@ body {
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
 }
 
-.flag-icon {
-    font-size: 1.1em;
-    line-height: 1;
+.region-flag-chip .fi {
+    width: 1.33333333em;
+    line-height: 1em;
+    display: inline-block;
+    border-radius: 2px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.5);
+    flex-shrink: 0;
 }
 
 /* Shared Entity Notification Banner */
