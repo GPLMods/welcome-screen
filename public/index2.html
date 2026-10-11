@@ -3,236 +3,1203 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GPL Mods - System Status & Welcome</title>
-    
-    <!-- Google Fonts & Icons -->
+    <title>GPL Mods - System Gateway & Status</title>
+    <link rel="icon" type="image/png" href="./assets/images/default-app-icon.png">
+
+    <!-- Fonts & Font Awesome Icons -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+    <!-- Main Welcome Screen Stylesheet -->
+    <link rel="stylesheet" href="./css/style.css">
 
     <style>
         :root {
             --black: #0a0a0a;
             --dark-gray: #1a1a1a;
+            --card-bg: rgba(22, 24, 34, 0.88);
+            --border-subtle: rgba(255, 255, 255, 0.08);
+            --border-dim: #262b3d;
             --white: #ffffff;
             --gold: #FFD700;
             --silver: #c0c0c0;
-            --red: #e53935;
             --green: #43a047;
+            --amber: #f39c12;
+            --red: #e53935;
+            --cyan: #00e5ff;
             --glow-gold: rgba(255, 215, 0, 0.5);
+            --glow-silver: rgba(192, 192, 192, 0.55);
+            --glow-green: rgba(67, 160, 71, 0.55);
+            --glow-red: rgba(229, 57, 53, 0.55);
+            --glow-amber: rgba(243, 156, 18, 0.55);
         }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { 
-            font-family: 'Poppins', sans-serif; 
-            background-color: var(--black); 
-            color: var(--white); 
-            display: flex; 
-            flex-direction: column; 
-            align-items: center; 
-            min-height: 100vh; 
-            background-image: radial-gradient(circle at top, #1a1a1a 0%, #0a0a0a 100%);
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
         }
 
-        .container {
-            max-width: 600px;
-            width: 90%;
-            margin: 40px auto;
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--black);
+            color: var(--white);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            overflow-x: hidden;
+            background-image:
+                radial-gradient(circle at 50% -10%, #1e2235 0%, #0a0a0a 65%),
+                linear-gradient(rgba(255, 255, 255, 0.018) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255, 255, 255, 0.018) 1px, transparent 1px);
+            background-size: 100% 100%, 36px 36px, 36px 36px;
+        }
+
+        /* Ambient floating backdrop lights */
+        .ambient-glow {
+            position: fixed;
+            width: 450px;
+            height: 450px;
+            border-radius: 50%;
+            pointer-events: none;
+            filter: blur(120px);
+            z-index: 0;
+            opacity: 0.18;
+            transition: all 1s ease;
+        }
+        .glow-top-left {
+            top: -100px;
+            left: -100px;
+            background: var(--gold);
+        }
+        .glow-bottom-right {
+            bottom: -100px;
+            right: -100px;
+            background: #00e5ff;
+        }
+
+        /* Top Telemetry Header */
+        .gateway-top-bar {
+            width: 100%;
+            max-width: 1140px;
+            padding: 20px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 10;
+        }
+
+        .telemetry-chip-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .telemetry-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 7px 14px;
+            background: rgba(18, 20, 30, 0.85);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid var(--border-subtle);
+            border-radius: 20px;
+            font-size: 0.82em;
+            color: var(--silver);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+            transition: all 0.3s ease;
+        }
+
+        .telemetry-chip:hover {
+            border-color: rgba(255, 215, 0, 0.3);
+            color: var(--white);
+        }
+
+        .status-dot-pulse {
+            width: 9px;
+            height: 9px;
+            border-radius: 50%;
+            background-color: var(--amber);
+            box-shadow: 0 0 10px var(--amber);
+            transition: all 0.3s ease;
+            animation: radarPulse 1.8s infinite;
+        }
+
+        .status-dot-pulse.green {
+            background-color: var(--green);
+            box-shadow: 0 0 10px var(--green);
+        }
+        .status-dot-pulse.yellow {
+            background-color: var(--gold);
+            box-shadow: 0 0 10px var(--gold);
+        }
+        .status-dot-pulse.red {
+            background-color: var(--red);
+            box-shadow: 0 0 10px var(--red);
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .btn-header-reping {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border-subtle);
+            color: var(--silver);
+            padding: 7px 14px;
+            border-radius: 20px;
+            font-size: 0.82em;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.25s ease;
+            backdrop-filter: blur(8px);
+        }
+
+        .btn-header-reping:hover {
+            color: var(--gold);
+            border-color: var(--gold);
+            transform: translateY(-2px);
+            box-shadow: 0 0 12px var(--glow-gold);
+        }
+
+        /* Container Layout */
+        .gateway-container {
+            max-width: 960px;
+            width: 92%;
+            margin: 15px auto 60px;
+            text-align: center;
+            position: relative;
+            z-index: 5;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        /* Main Branding */
+        .brand-header {
+            margin-bottom: 25px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .logo-main {
+            font-family: 'Outfit', sans-serif;
+            font-size: 3.4em;
+            font-weight: 800;
+            color: var(--gold);
+            text-shadow: 0 0 15px var(--glow-gold), 0 0 35px rgba(255, 215, 0, 0.25);
+            text-decoration: none;
+            display: inline-flex;
+            align-items: baseline;
+            gap: 8px;
+            letter-spacing: -0.5px;
+            transition: transform 0.3s ease;
+        }
+
+        .logo-main:hover {
+            transform: scale(1.02);
+        }
+
+        .logo-main span {
+            color: var(--silver);
+            text-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
+            font-weight: 400;
+        }
+
+        .brand-subtitle {
+            color: var(--silver);
+            font-size: 0.95em;
+            font-weight: 400;
+            letter-spacing: 0.5px;
+        }
+
+        /* Centerpiece Status Card */
+        .status-master-card {
+            width: 100%;
+            max-width: 680px;
+            background: var(--card-bg);
+            border-radius: 22px;
+            padding: 38px 32px 32px;
+            border: 1px solid rgba(255, 215, 0, 0.25);
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.7), 0 0 25px rgba(255, 215, 0, 0.12);
+            backdrop-filter: blur(18px);
+            -webkit-backdrop-filter: blur(18px);
+            margin-bottom: 35px;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .status-master-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, transparent, var(--gold), transparent);
+            opacity: 0.8;
+        }
+
+        .status-master-card.state-green {
+            border-color: rgba(67, 160, 71, 0.4);
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.7), 0 0 30px rgba(67, 160, 71, 0.18);
+        }
+        .status-master-card.state-green::before {
+            background: linear-gradient(90deg, transparent, var(--green), transparent);
+        }
+
+        .status-master-card.state-yellow {
+            border-color: rgba(255, 215, 0, 0.4);
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.7), 0 0 30px var(--glow-gold);
+        }
+        .status-master-card.state-yellow::before {
+            background: linear-gradient(90deg, transparent, var(--gold), transparent);
+        }
+
+        .status-master-card.state-red {
+            border-color: rgba(229, 57, 53, 0.4);
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.7), 0 0 30px var(--glow-red);
+        }
+        .status-master-card.state-red::before {
+            background: linear-gradient(90deg, transparent, var(--red), transparent);
+        }
+
+        /* Concentric Radar Orb Indicator */
+        .radar-orb-wrapper {
+            position: relative;
+            width: 90px;
+            height: 90px;
+            margin: 0 auto 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .radar-ring {
+            position: absolute;
+            border-radius: 50%;
+            pointer-events: none;
+            transition: all 0.4s ease;
+        }
+
+        .radar-ring.outer {
+            width: 100%;
+            height: 100%;
+            border: 1px solid rgba(255, 215, 0, 0.2);
+            animation: radarPulse 2.4s ease-out infinite;
+        }
+
+        .radar-ring.middle {
+            width: 72%;
+            height: 72%;
+            border: 1px solid rgba(255, 215, 0, 0.4);
+            animation: radarPulse 2.4s ease-out 0.6s infinite;
+        }
+
+        .radar-orb-center {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background: #191b26;
+            border: 2px solid var(--gold);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25em;
+            color: var(--gold);
+            box-shadow: 0 0 16px var(--glow-gold);
+            z-index: 2;
+            transition: all 0.4s ease;
+        }
+
+        @keyframes radarPulse {
+            0% {
+                transform: scale(0.65);
+                opacity: 0.8;
+            }
+            70% {
+                transform: scale(1.15);
+                opacity: 0;
+            }
+            100% {
+                transform: scale(1.15);
+                opacity: 0;
+            }
+        }
+
+        /* Radar colors based on server status */
+        .state-green .radar-orb-center {
+            border-color: var(--green);
+            color: var(--green);
+            box-shadow: 0 0 20px var(--glow-green);
+        }
+        .state-green .radar-ring {
+            border-color: rgba(67, 160, 71, 0.35);
+        }
+
+        .state-yellow .radar-orb-center {
+            border-color: var(--gold);
+            color: var(--gold);
+            box-shadow: 0 0 20px var(--glow-gold);
+        }
+        .state-yellow .radar-ring {
+            border-color: rgba(255, 215, 0, 0.35);
+        }
+
+        .state-red .radar-orb-center {
+            border-color: var(--red);
+            color: var(--red);
+            box-shadow: 0 0 20px var(--glow-red);
+        }
+        .state-red .radar-ring {
+            border-color: rgba(229, 57, 53, 0.35);
+        }
+
+        .status-title-text {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.6em;
+            font-weight: 700;
+            margin-bottom: 8px;
+            letter-spacing: -0.2px;
+            transition: color 0.3s ease;
+        }
+
+        .status-desc-text {
+            color: var(--silver);
+            font-size: 0.95em;
+            line-height: 1.6;
+            max-width: 540px;
+            margin: 0 auto 24px;
+        }
+
+        /* Telemetry Metrology Strip */
+        .metrology-strip {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            background: rgba(14, 16, 24, 0.8);
+            border: 1px solid var(--border-subtle);
+            border-radius: 14px;
+            padding: 12px 16px;
+            margin-bottom: 25px;
+        }
+
+        .metro-item {
+            display: flex;
+            flex-direction: column;
+            gap: 3px;
             text-align: center;
         }
 
-        .logo { font-size: 3em; font-weight: 700; color: var(--gold); text-shadow: 0 0 15px var(--glow-gold); text-decoration: none; display: inline-block; margin-bottom: 20px;}
-        .logo span { color: var(--silver); text-shadow: none; }
-
-        .status-card {
-            background-color: var(--dark-gray);
-            border-radius: 15px;
-            padding: 40px 30px;
-            border: 1px solid #333;
-            box-shadow: 0 15px 35px rgba(0,0,0,0.5);
-            margin-bottom: 30px;
-            position: relative;
-            overflow: hidden;
+        .metro-label {
+            font-size: 0.72em;
+            color: #8890a6;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-weight: 600;
         }
 
-        /* --- The Traffic Light Status Indicator --- */
-        .status-indicator {
+        .metro-val {
+            font-family: 'Outfit', monospace;
+            font-size: 0.95em;
+            font-weight: 700;
+            color: var(--white);
+        }
+
+        .metro-val.highlight-gold {
+            color: var(--gold);
+            text-shadow: 0 0 8px rgba(255, 215, 0, 0.3);
+        }
+        .metro-val.highlight-green {
+            color: var(--green);
+        }
+
+        /* Primary Action Button */
+        .btn-cta-main {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            padding: 14px 34px;
+            background-color: var(--gold);
+            color: var(--black);
+            text-decoration: none;
+            font-family: 'Outfit', sans-serif;
+            font-weight: 700;
+            font-size: 1.08em;
+            border-radius: 30px;
+            border: none;
+            cursor: pointer;
+            box-shadow: 0 0 20px var(--glow-gold), 0 8px 25px rgba(0,0,0,0.5);
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            position: relative;
+            overflow: hidden;
+            width: auto;
+            min-width: 260px;
+        }
+
+        .btn-cta-main:hover {
+            transform: translateY(-3px) scale(1.02);
+            box-shadow: 0 0 30px var(--glow-gold), 0 12px 30px rgba(0,0,0,0.6);
+            color: var(--black);
+        }
+
+        .btn-cta-main:disabled {
+            background: #2a2e3d;
+            color: #7b8296;
+            box-shadow: none;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* Countdown Progress Indicator */
+        .countdown-progress-bar {
+            width: 100%;
+            height: 4px;
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 2px;
+            margin-top: 18px;
+            overflow: hidden;
+            display: none;
+        }
+
+        .countdown-progress-fill {
+            height: 100%;
+            width: 0%;
+            background: var(--gold);
+            box-shadow: 0 0 8px var(--glow-gold);
+            transition: width 0.1s linear;
+        }
+
+        /* Network Topology Hub */
+        .network-section {
+            width: 100%;
+            margin-bottom: 45px;
+            text-align: left;
+        }
+
+        .section-header-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 18px;
+            padding: 0 4px;
+        }
+
+        .section-title-tag {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.25em;
+            font-weight: 700;
+            color: var(--white);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .section-title-tag i {
+            color: var(--gold);
+            text-shadow: 0 0 10px var(--glow-gold);
+        }
+
+        .network-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 14px;
+        }
+
+        .node-card {
+            background: rgba(18, 20, 28, 0.75);
+            border: 1px solid var(--border-subtle);
+            border-radius: 16px;
+            padding: 16px 18px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            gap: 10px;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .node-card:hover {
+            border-color: rgba(255, 215, 0, 0.35);
+            transform: translateY(-3px);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6), 0 0 12px rgba(255, 215, 0, 0.15);
+        }
+
+        .node-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .node-label {
+            font-size: 0.82em;
+            color: #8c93a8;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .node-badge {
+            font-size: 0.72em;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-weight: 700;
+            background: rgba(255, 215, 0, 0.12);
+            color: var(--gold);
+            border: 1px solid rgba(255, 215, 0, 0.25);
+        }
+
+        .node-badge.cyan {
+            background: rgba(0, 229, 255, 0.12);
+            color: var(--cyan);
+            border-color: rgba(0, 229, 255, 0.25);
+        }
+
+        .node-badge.green {
+            background: rgba(67, 160, 71, 0.15);
+            color: var(--green);
+            border-color: rgba(67, 160, 71, 0.3);
+        }
+
+        .node-value-box {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+            background: rgba(10, 11, 16, 0.7);
+            padding: 8px 12px;
+            border-radius: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.04);
+        }
+
+        .node-value-text {
+            font-family: monospace;
+            font-size: 0.88em;
+            color: var(--white);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .node-copy-btn {
+            background: transparent;
+            border: none;
+            color: var(--silver);
+            cursor: pointer;
+            font-size: 0.9em;
+            padding: 3px 6px;
+            border-radius: 6px;
+            transition: all 0.2s;
+            flex-shrink: 0;
+        }
+
+        .node-copy-btn:hover {
+            color: var(--gold);
+            transform: scale(1.15);
+        }
+
+        /* ========================================================= */
+        /* FEATURED / VERIFIED MOD CARDS SHOWCASE                     */
+        /* (Matching views/partials/mod-card.ejs and public/css/style.css) */
+        /* ========================================================= */
+        .featured-mods-section {
+            width: 100%;
+            margin-bottom: 50px;
+            text-align: left;
+        }
+
+        .mods-showcase-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 20px;
+            justify-items: center;
+        }
+
+        /* Enhanced Mod Card tweaks for the Showcase Grid */
+        .mods-showcase-grid .mod-card {
+            width: 100%;
+            max-width: 280px;
+            background-color: var(--dark-gray);
+            border: 1px solid #222;
+            border-radius: 15px;
+            overflow: hidden;
+            position: relative;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+            transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+        }
+
+        .mods-showcase-grid .mod-card:hover {
+            transform: translateY(-8px);
+            border-color: var(--gold);
+            box-shadow: 0 10px 25px var(--glow-gold);
+        }
+
+        /* Toast Copy Notification */
+        .copy-toast {
+            position: fixed;
+            bottom: 30px;
+            background: rgba(20, 22, 32, 0.95);
+            border: 1px solid var(--gold);
+            color: var(--gold);
+            padding: 10px 22px;
+            border-radius: 25px;
+            font-size: 0.88em;
+            font-weight: 600;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.8), 0 0 15px var(--glow-gold);
+            backdrop-filter: blur(12px);
+            opacity: 0;
+            transform: translateY(20px);
+            pointer-events: none;
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            z-index: 9999;
+        }
+
+        .copy-toast.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Footer */
+        .gateway-footer {
+            margin-top: auto;
+            padding: 24px 20px;
+            color: #7b8296;
+            font-size: 0.82em;
             display: flex;
             align-items: center;
             justify-content: center;
             gap: 15px;
-            margin-bottom: 20px;
-            padding: 15px;
-            border-radius: 10px;
-            background: #111;
+            flex-wrap: wrap;
+            border-top: 1px solid var(--border-subtle);
+            width: 100%;
+            max-width: 1140px;
         }
 
-        .status-dot {
-            width: 20px;
-            height: 20px;
-            border-radius: 50%;
-            background-color: #555; /* Default Gray */
-            transition: all 0.3s ease;
-        }
-
-        /* Animations for different states */
-        @keyframes pulse-green { 0% { box-shadow: 0 0 0 0 rgba(67, 160, 71, 0.7); } 70% { box-shadow: 0 0 0 15px rgba(67, 160, 71, 0); } 100% { box-shadow: 0 0 0 0 rgba(67, 160, 71, 0); } }
-        @keyframes pulse-yellow { 0% { box-shadow: 0 0 0 0 rgba(255, 215, 0, 0.7); } 70% { box-shadow: 0 0 0 15px rgba(255, 215, 0, 0); } 100% { box-shadow: 0 0 0 0 rgba(255, 215, 0, 0); } }
-        @keyframes pulse-red { 0% { box-shadow: 0 0 0 0 rgba(229, 57, 53, 0.7); } 70% { box-shadow: 0 0 0 15px rgba(229, 57, 53, 0); } 100% { box-shadow: 0 0 0 0 rgba(229, 57, 53, 0); } }
-
-        .status-green .status-dot { background-color: var(--green); animation: pulse-green 2s infinite; }
-        .status-yellow .status-dot { background-color: var(--gold); animation: pulse-yellow 2s infinite; }
-        .status-red .status-dot { background-color: var(--red); animation: pulse-red 2s infinite; }
-
-        .status-text { font-size: 1.5em; font-weight: bold; }
-        .status-message { color: var(--silver); font-size: 1em; line-height: 1.6; }
-
-        .btn-redirect {
-            display: inline-block;
-            margin-top: 25px;
-            padding: 12px 30px;
-            background-color: var(--gold);
-            color: var(--black);
-            text-decoration: none;
-            font-weight: bold;
-            border-radius: 25px;
-            transition: all 0.3s ease;
-            box-shadow: 0 0 15px var(--glow-gold);
-            cursor: pointer;
-            border: none;
-            font-size: 1.1em;
-        }
-        .btn-redirect:hover { transform: translateY(-3px); box-shadow: 0 0 25px var(--glow-gold); }
-        .btn-redirect:disabled { background: #444; color: #888; box-shadow: none; cursor: not-allowed; transform: none; }
-
-        /* Tech Details Network Box */
-        .tech-card {
-            background-color: #111;
-            border: 1px solid #333;
-            border-radius: 12px;
-            padding: 20px;
-            text-align: left;
-            font-size: 0.9em;
+        .gateway-footer a {
             color: var(--silver);
-            margin-top: 30px;
+            text-decoration: none;
+            transition: color 0.2s;
         }
-        .tech-card h3 { color: var(--white); margin-bottom: 15px; border-bottom: 1px solid #333; padding-bottom: 8px; font-size: 1.2em;}
-        .tech-grid { display: grid; grid-template-columns: 1fr; gap: 10px; }
-        .tech-item { display: flex; justify-content: space-between; border-bottom: 1px dashed #222; padding-bottom: 5px;}
-        .tech-item span:last-child { font-family: monospace; color: var(--gold); }
-        .tech-item a { color: var(--gold); text-decoration: none; }
-        .tech-item a:hover { text-decoration: underline; }
 
+        .gateway-footer a:hover {
+            color: var(--gold);
+        }
+
+        @media (max-width: 768px) {
+            .gateway-top-bar {
+                flex-direction: column;
+                gap: 12px;
+                padding: 15px;
+            }
+            .logo-main {
+                font-size: 2.6em;
+            }
+            .status-master-card {
+                padding: 26px 18px 22px;
+            }
+            .metrology-strip {
+                grid-template-columns: 1fr;
+                gap: 8px;
+            }
+            .network-grid {
+                grid-template-columns: 1fr;
+            }
+            .btn-cta-main {
+                width: 100%;
+            }
+        }
     </style>
 </head>
 <body>
 
-    <div class="container">
-        <a href="#" class="logo">GPL <span>Mods</span></a>
+    <!-- Ambient backdrop glow orbs -->
+    <div class="ambient-glow glow-top-left" id="ambientGlowTop"></div>
+    <div class="ambient-glow glow-bottom-right" id="ambientGlowBottom"></div>
+
+    <!-- TOP TELEMETRY BAR -->
+    <header class="gateway-top-bar">
+        <div class="telemetry-chip-group">
+            <div class="telemetry-chip" id="topStatusChip">
+                <span class="status-dot-pulse yellow" id="topStatusDot"></span>
+                <span id="topStatusText">Checking Origin Cluster...</span>
+            </div>
+            <div class="telemetry-chip" title="Measured Latency">
+                <i class="fas fa-bolt" style="color: var(--gold); font-size: 0.85em;"></i>
+                <span id="topLatencyBadge">-- ms</span>
+            </div>
+            <div class="telemetry-chip" title="Cloudflare CDN Edge">
+                <i class="fas fa-globe" style="color: var(--cyan); font-size: 0.85em;"></i>
+                <span>Global Edge</span>
+            </div>
+        </div>
+
+        <div class="header-actions">
+            <button class="btn-header-reping" onclick="checkServerStatus(true)" title="Instant Re-Check">
+                <i class="fas fa-sync-alt" id="repingIcon"></i> Re-Ping
+            </button>
+            <a href="https://gplmods.webredirect.org" class="btn-header-reping" target="_blank" title="Open Main Link">
+                <i class="fas fa-external-link-alt"></i> Portal
+            </a>
+        </div>
+    </header>
+
+    <!-- MAIN DASHBOARD CONTAINER -->
+    <div class="gateway-container">
         
-        <div class="status-card" id="statusContainer">
-            <h2 style="margin-bottom: 15px;">Main Server Connection</h2>
+        <!-- BRANDING -->
+        <div class="brand-header">
+            <a href="https://gplmods.webredirect.org" class="logo-main">
+                GPL <span>Mods</span>
+            </a>
+            <p class="brand-subtitle">
+                High-Availability Cloud Edge & System Telemetry Gateway
+            </p>
+        </div>
+
+        <!-- CENTERPIECE STATUS CARD -->
+        <div class="status-master-card state-yellow" id="statusCard">
             
-            <div class="status-indicator" id="statusIndicator">
-                <div class="status-dot"></div>
-                <div class="status-text" id="statusText">Pinging Server...</div>
+            <!-- Holographic Radar Orb -->
+            <div class="radar-orb-wrapper">
+                <div class="radar-ring outer"></div>
+                <div class="radar-ring middle"></div>
+                <div class="radar-orb-center" id="radarCenterIcon">
+                    <i class="fas fa-satellite-dish fa-spin" style="animation-duration: 4s;"></i>
+                </div>
             </div>
 
-            <p class="status-message" id="statusMessage">
-                Please wait while we establish a connection to the main GPL Mods cluster.
+            <!-- Status Headings -->
+            <h2 class="status-title-text" id="statusTitle" style="color: var(--gold);">
+                Establishing Handshake...
+            </h2>
+
+            <p class="status-desc-text" id="statusDesc">
+                Please wait while we establish a secure telemetry handshake with the main GPL Mods cluster.
             </p>
 
-            <button id="mainBtn" class="btn-redirect" disabled>
-                <i class="fas fa-spinner fa-spin"></i> Establishing Connection...
-            </button>
-        </div>
-
-        <!-- Technical Network Details -->
-        <div class="tech-card">
-            <h3><i class="fas fa-network-wired" style="color: var(--gold); margin-right: 8px;"></i> Network Topology</h3>
-            <div class="tech-grid">
-                <div class="tech-item">
-                    <span>Main Domain:</span>
-                    <a href="https://gplmods.webredirect.org" target="_blank">gplmods.webredirect.org</a>
+            <!-- Metrology Strip -->
+            <div class="metrology-strip">
+                <div class="metro-item">
+                    <span class="metro-label">Roundtrip Latency</span>
+                    <span class="metro-val highlight-gold" id="metroLatency">-- ms</span>
                 </div>
-                <div class="tech-item">
-                    <span>Anti-Revoke Archive DNS:</span>
-                    <a href="https://gplmods.mytunnel.org" target="_blank">gplmods.mytunnel.org</a>
+                <div class="metro-item">
+                    <span class="metro-label">Gateway Response</span>
+                    <span class="metro-val" id="metroHttp">Pinging...</span>
                 </div>
-                <div class="tech-item">
-                    <span>Render Main IP Ranges:</span>
-                    <span>74.220.52.0/24 | 74.220.60.0/24</span>
-                </div>
-                <div class="tech-item">
-                    <span>CDN Edge:</span>
-                    <span>cdn.gplmodsofficial.workers.dev</span>
-                </div>
-                <div class="tech-item" style="border: none;">
-                    <span>Failback JS Host:</span>
-                    <span>gplmods.great-site.net</span>
+                <div class="metro-item">
+                    <span class="metro-label">Origin Pipeline</span>
+                    <span class="metro-val" id="metroPipeline">Render Anycast</span>
                 </div>
             </div>
+
+            <!-- Main CTA Button -->
+            <button id="mainActionBtn" class="btn-cta-main" disabled>
+                <i class="fas fa-spinner fa-spin"></i> Establishing Connection...
+            </button>
+
+            <!-- Countdown Bar (Active when Green) -->
+            <div class="countdown-progress-bar" id="countdownContainer">
+                <div class="countdown-progress-fill" id="countdownFill"></div>
+            </div>
         </div>
+
+        <!-- NETWORK TOPOLOGY HUB -->
+        <section class="network-section">
+            <div class="section-header-row">
+                <h3 class="section-title-tag">
+                    <i class="fas fa-network-wired"></i> Network Infrastructure Topology
+                </h3>
+                <span style="font-size: 0.8em; color: var(--silver);"><i class="fas fa-shield-alt" style="color: var(--gold);"></i> Redundant Anycast</span>
+            </div>
+
+            <div class="network-grid">
+                
+                <!-- Node 1: Main Gateway -->
+                <div class="node-card">
+                    <div class="node-header">
+                        <span class="node-label">Primary Gateway</span>
+                        <span class="node-badge green">Online</span>
+                    </div>
+                    <div class="node-value-box">
+                        <span class="node-value-text" id="node-val-1">https://gplmods.webredirect.org</span>
+                        <button class="node-copy-btn" onclick="copyNodeText('https://gplmods.webredirect.org')" title="Copy URL">
+                            <i class="fas fa-copy"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Node 2: Archive DNS -->
+                <div class="node-card">
+                    <div class="node-header">
+                        <span class="node-label">Anti-Revoke Archive DNS</span>
+                        <span class="node-badge">Failover Mirror</span>
+                    </div>
+                    <div class="node-value-box">
+                        <span class="node-value-text" id="node-val-2">https://gplmods.mytunnel.org</span>
+                        <button class="node-copy-btn" onclick="copyNodeText('https://gplmods.mytunnel.org')" title="Copy URL">
+                            <i class="fas fa-copy"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Node 3: Render Origin Subnets -->
+                <div class="node-card">
+                    <div class="node-header">
+                        <span class="node-label">Render Origin Subnet</span>
+                        <span class="node-badge cyan">Anycast IPv4</span>
+                    </div>
+                    <div class="node-value-box">
+                        <span class="node-value-text" id="node-val-3">74.220.52.0/24 | 74.220.60.0/24</span>
+                        <button class="node-copy-btn" onclick="copyNodeText('74.220.52.0/24 | 74.220.60.0/24')" title="Copy Subnets">
+                            <i class="fas fa-copy"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Node 4: Cloudflare CDN Edge -->
+                <div class="node-card">
+                    <div class="node-header">
+                        <span class="node-label">Edge CDN Proxy</span>
+                        <span class="node-badge cyan">Edge Cache</span>
+                    </div>
+                    <div class="node-value-box">
+                        <span class="node-value-text" id="node-val-4">cdn.gplmodsofficial.workers.dev</span>
+                        <button class="node-copy-btn" onclick="copyNodeText('cdn.gplmodsofficial.workers.dev')" title="Copy Edge">
+                            <i class="fas fa-copy"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Node 5: Static Failback Host -->
+                <div class="node-card">
+                    <div class="node-header">
+                        <span class="node-label">Failback Static Host</span>
+                        <span class="node-badge">Disaster Backup</span>
+                    </div>
+                    <div class="node-value-box">
+                        <span class="node-value-text" id="node-val-5">gplmods.great-site.net</span>
+                        <button class="node-copy-btn" onclick="copyNodeText('gplmods.great-site.net')" title="Copy Host">
+                            <i class="fas fa-copy"></i>
+                        </button>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- ========================================================= -->
+        <!-- POPULAR VERIFIED MODS SHOWCASE                             -->
+        <!-- (Replicating views/partials/mod-card.ejs & main site CSS) -->
+        <!-- ========================================================= -->
+        <section class="featured-mods-section">
+            <div class="section-header-row">
+                <h3 class="section-title-tag">
+                    <i class="fas fa-fire"></i> Trending Verified Releases
+                </h3>
+                <a href="https://gplmods.webredirect.org" target="_blank" style="color: var(--gold); text-decoration: none; font-size: 0.85em; font-weight: 600;">
+                    Explore All <i class="fas fa-arrow-right"></i>
+                </a>
+            </div>
+
+            <div class="mods-showcase-grid">
+
+                <!-- 1. Roblox Delta -->
+                <div class="mod-card">
+                    <div class="card-top-badges">
+                        <div class="app-feature-tag"><i class="fas fa-check-circle" style="font-size: 0.85em; margin-right: 4px;"></i> Certified</div>
+                        <div class="mod-type-tag">v2.604</div>
+                    </div>
+                    <div class="mod-card-image">
+                        <img src="./assets/images/roblox.jpg" alt="Roblox Delta" onerror="this.src='./assets/images/default-avatar.png'">
+                    </div>
+                    <div class="mod-card-content">
+                        <h3 title="Roblox Delta">
+                            <a href="https://gplmods.webredirect.org/mods/android/roblox-delta" class="full-card-link">Roblox Delta</a>
+                        </h3>
+                        <p>Delta Team</p>
+                        <div class="rating">
+                            <div class="stars-outer"><div class="stars-inner" style="width: 96%;"></div></div>
+                            <span class="rating-text">4.8</span>
+                        </div>
+                        <div class="card-footer">
+                            <span class="platform-tag android">ANDROID</span>
+                            <div class="view-count" title="3.2M Views">
+                                <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor">
+                                    <path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/>
+                                </svg>
+                                3.2M
+                            </div>
+                        </div>
+                    </div>
+                    <div class="download-overlay">
+                        <a href="https://gplmods.webredirect.org/mods/android/roblox-delta" class="overlay-button overlay-btn-primary">View Mod</a>
+                        <a href="https://gplmods.webredirect.org/login" class="overlay-button overlay-btn-secondary wishlist-btn">
+                            <i class="fas fa-heart"></i> Add to Wishlist
+                        </a>
+                    </div>
+                </div>
+
+                <!-- 2. Kinemaster Pro -->
+                <div class="mod-card">
+                    <div class="card-top-badges">
+                        <div class="app-feature-tag"><i class="fas fa-check-circle" style="font-size: 0.85em; margin-right: 4px;"></i> Certified</div>
+                        <div class="mod-type-tag">v7.3</div>
+                    </div>
+                    <div class="mod-card-image">
+                        <img src="./assets/images/kinemaster.jpg" alt="Kinemaster Pro" onerror="this.src='./assets/images/default-avatar.png'">
+                    </div>
+                    <div class="mod-card-content">
+                        <h3 title="Kinemaster Pro">
+                            <a href="https://gplmods.webredirect.org/mods/android/kinemaster-pro" class="full-card-link">Kinemaster Pro</a>
+                        </h3>
+                        <p>KineMaster Corp.</p>
+                        <div class="rating">
+                            <div class="stars-outer"><div class="stars-inner" style="width: 98%;"></div></div>
+                            <span class="rating-text">4.9</span>
+                        </div>
+                        <div class="card-footer">
+                            <span class="platform-tag android">ANDROID</span>
+                            <div class="view-count" title="1.1M Views">
+                                <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor">
+                                    <path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/>
+                                </svg>
+                                1.1M
+                            </div>
+                        </div>
+                    </div>
+                    <div class="download-overlay">
+                        <a href="https://gplmods.webredirect.org/mods/android/kinemaster-pro" class="overlay-button overlay-btn-primary">View Mod</a>
+                        <a href="https://gplmods.webredirect.org/login" class="overlay-button overlay-btn-secondary wishlist-btn">
+                            <i class="fas fa-heart"></i> Add to Wishlist
+                        </a>
+                    </div>
+                </div>
+
+                <!-- 3. Elementor Pro -->
+                <div class="mod-card">
+                    <div class="card-top-badges">
+                        <div class="app-feature-tag" style="background-color: var(--silver); color: var(--black);">Community Tested</div>
+                        <div class="mod-type-tag">v3.15</div>
+                    </div>
+                    <div class="mod-card-image">
+                        <img src="./assets/images/elementor.jpg" alt="Elementor Pro" onerror="this.src='./assets/images/default-avatar.png'">
+                    </div>
+                    <div class="mod-card-content">
+                        <h3 title="Elementor Pro">
+                            <a href="https://gplmods.webredirect.org/mods/wordpress/elementor-pro" class="full-card-link">Elementor Pro</a>
+                        </h3>
+                        <p>Elementor Ltd.</p>
+                        <div class="rating">
+                            <div class="stars-outer"><div class="stars-inner" style="width: 94%;"></div></div>
+                            <span class="rating-text">4.7</span>
+                        </div>
+                        <div class="card-footer">
+                            <span class="platform-tag wordpress">WORDPRESS</span>
+                            <div class="view-count" title="850K Views">
+                                <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor">
+                                    <path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/>
+                                </svg>
+                                850K
+                            </div>
+                        </div>
+                    </div>
+                    <div class="download-overlay">
+                        <a href="https://gplmods.webredirect.org/mods/wordpress/elementor-pro" class="overlay-button overlay-btn-primary">View Mod</a>
+                        <a href="https://gplmods.webredirect.org/login" class="overlay-button overlay-btn-secondary wishlist-btn">
+                            <i class="fas fa-heart"></i> Add to Wishlist
+                        </a>
+                    </div>
+                </div>
+
+                <!-- 4. Fortnite Mobile -->
+                <div class="mod-card">
+                    <div class="card-top-badges">
+                        <div class="app-feature-tag"><i class="fas fa-check-circle" style="font-size: 0.85em; margin-right: 4px;"></i> Certified</div>
+                        <div class="mod-type-tag">v29.10</div>
+                    </div>
+                    <div class="mod-card-image">
+                        <img src="./assets/images/fortnite.jpg" alt="Fortnite Mobile" onerror="this.src='./assets/images/default-avatar.png'">
+                    </div>
+                    <div class="mod-card-content">
+                        <h3 title="Fortnite Mobile">
+                            <a href="https://gplmods.webredirect.org/mods/ios-ipa/fortnite-mobile" class="full-card-link">Fortnite Mobile</a>
+                        </h3>
+                        <p>Epic Games</p>
+                        <div class="rating">
+                            <div class="stars-outer"><div class="stars-inner" style="width: 92%;"></div></div>
+                            <span class="rating-text">4.6</span>
+                        </div>
+                        <div class="card-footer">
+                            <span class="platform-tag ios-ipa">IOS IPA</span>
+                            <div class="view-count" title="2.1M Views">
+                                <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor">
+                                    <path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/>
+                                </svg>
+                                2.1M
+                            </div>
+                        </div>
+                    </div>
+                    <div class="download-overlay">
+                        <a href="https://gplmods.webredirect.org/mods/ios-ipa/fortnite-mobile" class="overlay-button overlay-btn-primary">View Mod</a>
+                        <a href="https://gplmods.webredirect.org/login" class="overlay-button overlay-btn-secondary wishlist-btn">
+                            <i class="fas fa-heart"></i> Add to Wishlist
+                        </a>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
     </div>
 
-    <!-- MAIN PING LOGIC -->
-    <script>
-        const MAIN_URL = 'https://gplmods.webredirect.org';
-        const HEALTH_ENDPOINT = MAIN_URL + '/healthz';
-        
-        const statusContainer = document.getElementById('statusContainer');
-        const statusIndicator = document.getElementById('statusIndicator');
-        const statusText = document.getElementById('statusText');
-        const statusMessage = document.getElementById('statusMessage');
-        const mainBtn = document.getElementById('mainBtn');
+    <!-- COPY FEEDBACK TOAST -->
+    <div class="copy-toast" id="copyToast">
+        <i class="fas fa-check-circle"></i> Endpoint copied to clipboard!
+    </div>
 
-        function setStatus(state, delay) {
-            statusIndicator.className = `status-indicator status-${state}`;
-            
+    <!-- FOOTER -->
+    <footer class="gateway-footer">
+        <span>&copy; 2026 GPL Mods Official. All Rights Reserved.</span>
+        <span>&bull;</span>
+        <a href="https://gplmods.webredirect.org" target="_blank">Main Portal</a>
+        <span>&bull;</span>
+        <a href="https://gplmods.mytunnel.org" target="_blank">Archive DNS</a>
+        <span>&bull;</span>
+        <a href="https://t.me/gplmods" target="_blank"><i class="fab fa-telegram"></i> Telegram Community</a>
+    </footer>
+
+    <!-- REAL-TIME TELEMETRY SCRIPT -->
+    <script>
+        const urlParams = new URLSearchParams(window.location.search);
+        const MAIN_URL = urlParams.get('host') || 'https://gplmods.webredirect.org';
+        const HEALTH_ENDPOINT = MAIN_URL + '/healthz';
+
+        const statusCard = document.getElementById('statusCard');
+        const radarCenterIcon = document.getElementById('radarCenterIcon');
+        const statusTitle = document.getElementById('statusTitle');
+        const statusDesc = document.getElementById('statusDesc');
+        const mainActionBtn = document.getElementById('mainActionBtn');
+        const repingIcon = document.getElementById('repingIcon');
+
+        const topStatusChip = document.getElementById('topStatusChip');
+        const topStatusDot = document.getElementById('topStatusDot');
+        const topStatusText = document.getElementById('topStatusText');
+        const topLatencyBadge = document.getElementById('topLatencyBadge');
+
+        const metroLatency = document.getElementById('metroLatency');
+        const metroHttp = document.getElementById('metroHttp');
+        const metroPipeline = document.getElementById('metroPipeline');
+
+        const countdownContainer = document.getElementById('countdownContainer');
+        const countdownFill = document.getElementById('countdownFill');
+        const copyToast = document.getElementById('copyToast');
+
+        let redirectTimer = null;
+        let wakePollingInterval = null;
+        let wakeStartTime = null;
+
+        function setStatus(state, latencyMs = 0) {
+            statusCard.className = `status-master-card state-${state}`;
+
             if (state === 'green') {
-                statusText.innerText = 'Online & Active';
-                statusText.style.color = 'var(--green)';
-                statusMessage.innerHTML = 'The server is fully awake and responding optimally. You can proceed to the main website.';
-                mainBtn.innerHTML = 'Enter GPL Mods <i class="fas fa-arrow-right"></i>';
-                mainBtn.disabled = false;
-                mainBtn.onclick = () => window.location.href = MAIN_URL;
-                
-                // Optional: Auto redirect after 3 seconds if green
-                // setTimeout(() => { window.location.href = MAIN_URL; }, 3000);
+                topStatusDot.className = 'status-dot-pulse green';
+                topStatusText.textContent = 'Cluster Online & Active';
+                topLatencyBadge.textContent = `${latencyMs} ms`;
+
+                metroLatency.textContent = `${latencyMs} ms`;
+                metroLatency.className = 'metro-val highlight-green';
+                metroHttp.textContent = 'HTTP 200 OK';
+                metroPipeline.textContent = 'Render Active';
+
+                radarCenterIcon.innerHTML = '<i class="fas fa-check"></i>';
+                statusTitle.innerText = 'Cluster Online & Fully Active';
+                statusTitle.style.color = 'var(--green)';
+                statusDesc.innerHTML = 'The origin Render node is responding with optimal latency. Handshake established successfully.';
+
+                mainActionBtn.innerHTML = 'Enter GPL Mods <i class="fas fa-arrow-right"></i>';
+                mainActionBtn.disabled = false;
+                mainActionBtn.style.backgroundColor = 'var(--gold)';
+                mainActionBtn.style.color = 'var(--black)';
+                mainActionBtn.style.boxShadow = '0 0 20px var(--glow-gold), 0 8px 25px rgba(0,0,0,0.5)';
+                mainActionBtn.onclick = () => window.location.href = MAIN_URL;
+
+                // Start 4-second auto redirect countdown
+                startCountdown(4);
 
             } else if (state === 'yellow') {
-                statusText.innerText = 'Server Waking Up...';
-                statusText.style.color = 'var(--gold)';
-                statusMessage.innerHTML = 'Because we use a scalable cloud host, the server sleeps during low activity. It is currently waking up. <strong>This usually takes 30 to 60 seconds.</strong> Please wait, we will redirect you automatically.';
-                mainBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Booting Container...';
-                mainBtn.disabled = true;
-                
-                // Re-poll the server after a delay to see if it woke up
-                setTimeout(checkServerStatus, 5000);
+                topStatusDot.className = 'status-dot-pulse yellow';
+                topStatusText.textContent = 'Waking Origin Server...';
+                topLatencyBadge.textContent = latencyMs > 0 ? `${latencyMs} ms` : 'Booting...';
+
+                metroLatency.textContent = latencyMs > 0 ? `${latencyMs} ms` : 'Waking...';
+                metroLatency.className = 'metro-val highlight-gold';
+                metroHttp.textContent = 'HTTP Booting';
+                metroPipeline.textContent = 'Spinning Container';
+
+                radarCenterIcon.innerHTML = '<i class="fas fa-power-off fa-spin"></i>';
+                statusTitle.innerText = 'Server Spinning Up...';
+                statusTitle.style.color = 'var(--gold)';
+                statusDesc.innerHTML = 'Because Render spins down free containers during periods of low activity, the instance is waking up. <strong>This typically completes in 30 to 50 seconds.</strong> We will automatically redirect you once ready.';
+
+                if (!wakeStartTime) wakeStartTime = Date.now();
+                const elapsedSec = Math.round((Date.now() - wakeStartTime) / 1000);
+
+                mainActionBtn.innerHTML = `<i class="fas fa-spinner fa-spin"></i> Booting Container (${elapsedSec}s)...`;
+                mainActionBtn.disabled = true;
+
+                // Re-poll every 5 seconds until green
+                clearTimeout(wakePollingInterval);
+                wakePollingInterval = setTimeout(() => checkServerStatus(false), 5000);
 
             } else if (state === 'red') {
-                statusText.innerText = 'Service Offline';
-                statusText.style.color = 'var(--red)';
-                statusMessage.innerHTML = 'The main Render service is currently unreachable or undergoing maintenance. Please use our Anti-Revoke Archive DNS in the meantime.';
-                
-                mainBtn.innerHTML = '<i class="fas fa-shield-alt"></i> Go to Archive DNS';
-                mainBtn.disabled = false;
-                mainBtn.style.backgroundColor = 'var(--red)';
-                mainBtn.style.color = 'var(--white)';
-                mainBtn.style.boxShadow = '0 0 15px rgba(229, 57, 53, 0.5)';
-                mainBtn.onclick = () => window.location.href = 'https://gplmods.mytunnel.org';
+                topStatusDot.className = 'status-dot-pulse red';
+                topStatusText.textContent = 'Origin Unreachable';
+                topLatencyBadge.textContent = 'Timeout';
+
+                metroLatency.textContent = 'N/A';
+                metroLatency.className = 'metro-val';
+                metroHttp.textContent = 'Connection Err';
+                metroPipeline.textContent = 'Failover DNS';
+
+                radarCenterIcon.innerHTML = '<i class="fas fa-shield-alt"></i>';
+                statusTitle.innerText = 'Origin Delayed — Use Mirror';
+                statusTitle.style.color = 'var(--red)';
+                statusDesc.innerHTML = 'The primary Render gateway did not respond within the allocated threshold. You can instantly access the catalog via our Anti-Revoke Archive DNS mirror.';
+
+                mainActionBtn.innerHTML = '<i class="fas fa-shield-alt"></i> Connect to Archive DNS';
+                mainActionBtn.disabled = false;
+                mainActionBtn.style.backgroundColor = 'var(--red)';
+                mainActionBtn.style.color = 'var(--white)';
+                mainActionBtn.style.boxShadow = '0 0 20px var(--glow-red), 0 8px 25px rgba(0,0,0,0.5)';
+                mainActionBtn.onclick = () => window.location.href = 'https://gplmods.mytunnel.org';
             }
         }
 
-        async function checkServerStatus() {
+        async function checkServerStatus(isManual = false) {
+            if (isManual && repingIcon) {
+                repingIcon.classList.add('fa-spin');
+            }
+
             const startTime = Date.now();
             const controller = new AbortController();
-            const timeoutId = setTimeout(() => controller.abort(), 15000); // 15 second timeout
+            const timeoutId = setTimeout(() => controller.abort(), 12000); // 12 second threshold
 
             try {
-                // We fetch the healthz endpoint. Note: mode: 'no-cors' is used just in case CORS fails,
-                // but since we rely on the response time, catching an error or delay is the main goal.
                 const response = await fetch(HEALTH_ENDPOINT, { 
                     method: 'GET', 
                     signal: controller.signal,
@@ -242,8 +1209,11 @@
                 clearTimeout(timeoutId);
                 const responseTime = Date.now() - startTime;
 
+                if (isManual && repingIcon) {
+                    setTimeout(() => repingIcon.classList.remove('fa-spin'), 600);
+                }
+
                 if (response.ok || response.type === 'opaque') {
-                    // Render free tier spins down. If it takes > 3.5 seconds to reply, it was definitely asleep and is booting up.
                     if (responseTime > 3500) {
                         setStatus('yellow', responseTime);
                     } else {
@@ -254,19 +1224,69 @@
                 }
             } catch (error) {
                 clearTimeout(timeoutId);
-                // If it's an AbortError, it timed out (took longer than 15s), meaning it's still waking up or heavily congested
+                if (isManual && repingIcon) {
+                    setTimeout(() => repingIcon.classList.remove('fa-spin'), 600);
+                }
+
                 if (error.name === 'AbortError') {
                     setStatus('yellow');
                 } else {
-                    // Actual network error (server is down)
                     setStatus('red');
                 }
             }
         }
 
-        // Start the check as soon as the fallback page loads
+        function startCountdown(seconds) {
+            if (!countdownContainer || !countdownFill) return;
+            countdownContainer.style.display = 'block';
+
+            let remaining = seconds;
+            const stepMs = 50;
+            const totalSteps = (seconds * 1000) / stepMs;
+            let currentStep = 0;
+
+            clearInterval(redirectTimer);
+            redirectTimer = setInterval(() => {
+                currentStep++;
+                const pct = (currentStep / totalSteps) * 100;
+                countdownFill.style.width = `${pct}%`;
+
+                if (currentStep >= totalSteps) {
+                    clearInterval(redirectTimer);
+                    window.location.href = MAIN_URL;
+                }
+            }, stepMs);
+        }
+
+        function copyNodeText(text) {
+            if (navigator.clipboard && window.isSecureContext) {
+                navigator.clipboard.writeText(text).then(showToast);
+            } else {
+                const textArea = document.createElement("textarea");
+                textArea.value = text;
+                textArea.style.position = "fixed";
+                textArea.style.left = "-999999px";
+                document.body.appendChild(textArea);
+                textArea.focus();
+                textArea.select();
+                try {
+                    document.execCommand('copy');
+                    showToast();
+                } catch (err) {}
+                document.body.removeChild(textArea);
+            }
+        }
+
+        function showToast() {
+            if (!copyToast) return;
+            copyToast.classList.add('show');
+            setTimeout(() => {
+                copyToast.classList.remove('show');
+            }, 2500);
+        }
+
         document.addEventListener('DOMContentLoaded', () => {
-            checkServerStatus();
+            checkServerStatus(false);
         });
     </script>
 </body>

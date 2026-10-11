@@ -771,14 +771,14 @@ function updateSlide() {
 const montageLayer = document.getElementById('montage-layer');
 
 const specificMods = [
-    { name: "Roblox Delta", cert: "Certified", tag: "Android", v: "v2.604", view: "3.2M", src: "roblox.jpg", class: "tag-android" },
-    { name: "Kinemaster Pro", cert: "Certified", tag: "Android", v: "v7.3", view: "1.1M", src: "kinemaster.jpg", class: "tag-android" },
-    { name: "Elementor Pro", cert: "Comm. Tested", tag: "WordPress", v: "v3.15", view: "850K", src: "elementor.jpg", class: "tag-wordpress" },
-    { name: "Astra Theme", cert: "Certified", tag: "WordPress", v: "v2.23", view: "420K", src: "astra.jpg", class: "tag-wordpress" },
-    { name: "Fortnite Mobile", cert: "Certified", tag: "iOS Jailed", v: "v29.10", view: "2.1M", src: "fortnite.jpg", class: "tag-ios" },
-    { name: "Minecraft Pocket", cert: "Certified", tag: "iOS Jailed", v: "v1.20", view: "5.4M", src: "minecraft.jpg", class: "tag-ios" },
-    { name: "Schedule I", cert: "Comm. Tested", tag: "Windows", v: "v1.0.4", view: "105K", src: "schedule1.jpg", class: "tag-windows" },
-    { name: "I Am Fish", cert: "Certified", tag: "Windows", v: "v2.1", view: "67K", src: "iamfish.jpg", class: "tag-windows" }
+    { name: "Roblox Delta", developer: "Delta Team", cert: "certified", category: "android", tag: "Android", v: "v2.604", rating: 4.8, views: "3.2M", src: "roblox.jpg", slug: "roblox-delta" },
+    { name: "Kinemaster Pro", developer: "KineMaster Corp.", cert: "certified", category: "android", tag: "Android", v: "v7.3", rating: 4.9, views: "1.1M", src: "kinemaster.jpg", slug: "kinemaster-pro" },
+    { name: "Elementor Pro", developer: "Elementor Ltd.", cert: "community-tested", category: "wordpress", tag: "WordPress", v: "v3.15", rating: 4.7, views: "850K", src: "elementor.jpg", slug: "elementor-pro" },
+    { name: "Astra Theme Pro", developer: "Brainstorm Force", cert: "certified", category: "wordpress", tag: "WordPress", v: "v2.23", rating: 4.9, views: "420K", src: "astra.jpg", slug: "astra-theme-pro" },
+    { name: "Fortnite Mobile", developer: "Epic Games", cert: "certified", category: "ios-ipa", tag: "iOS IPA", v: "v29.10", rating: 4.6, views: "2.1M", src: "fortnite.jpg", slug: "fortnite-mobile" },
+    { name: "Minecraft Pocket", developer: "Mojang Studios", cert: "certified", category: "ios-ipa", tag: "iOS IPA", v: "v1.20", rating: 4.9, views: "5.4M", src: "minecraft.jpg", slug: "minecraft-pocket" },
+    { name: "Schedule I", developer: "TVGS", cert: "community-tested", category: "windows", tag: "Windows", v: "v1.0.4", rating: 4.5, views: "105K", src: "schedule1.jpg", slug: "schedule-1" },
+    { name: "I Am Fish", developer: "Bossa Studios", cert: "certified", category: "windows", tag: "Windows", v: "v2.1", rating: 4.6, views: "67K", src: "iamfish.jpg", slug: "i-am-fish" }
 ];
 
 const reviewerNames = ['Admin', 'JohnDoe_xX', 'GPL_Fan_99', 'Modder_Elite', 'ShadowByte', 'SpeedRunner'];
@@ -790,13 +790,13 @@ const reviewTexts = [
     'Smooth performance and verified signatures.'
 ];
 
-function generateStarRatingHtml() {
-    return `<div class="star-rating">
-        <i class="fas fa-star"></i>
-        <i class="fas fa-star"></i>
-        <i class="fas fa-star"></i>
-        <i class="fas fa-star"></i>
-        <i class="fas fa-star"></i>
+function generateStarRatingHtml(score = 5) {
+    const pct = Math.min(100, Math.max(0, (score / 5) * 100));
+    return `<div class="rating" style="margin-bottom: 8px;">
+        <div class="stars-outer">
+            <div class="stars-inner" style="width: ${pct}%;"></div>
+        </div>
+        <span class="rating-text">${score.toFixed(1)}</span>
     </div>`;
 }
 
@@ -810,25 +810,47 @@ function spawnGhostElement() {
 
     if (isModCard) {
         const mod = specificMods[Math.floor(Math.random() * specificMods.length)];
-        const isTested = mod.cert === 'Comm. Tested';
+        const isTested = mod.cert === 'community-tested';
+        const cardModLink = `${MAIN_SITE_URL}/mods/${mod.category}/${mod.slug}`;
         el.innerHTML = `
             <div class="mod-card">
-                <span class="badge-certified ${isTested ? 'tested' : ''}">
-                    <i class="fas ${isTested ? 'fa-shield-halved' : 'fa-certificate'}"></i> ${mod.cert}
-                </span>
-                <span class="mod-type-tag">${mod.v}</span>
+                <div class="card-top-badges">
+                    ${isTested
+                        ? `<div class="app-feature-tag" style="background-color: var(--silver); color: var(--black);">Community Tested</div>`
+                        : `<div class="app-feature-tag"><i class="fas fa-check-circle" style="font-size: 0.85em; margin-right: 4px;"></i> Certified</div>`
+                    }
+                    <div class="mod-type-tag">${mod.v}</div>
+                </div>
+                
                 <div class="mod-card-image">
                     <img src="/assets/images/${mod.src}" alt="${mod.name}" onerror="this.src='/assets/images/default-avatar.png'">
                 </div>
+                
                 <div class="mod-card-content">
-                    <h3>${mod.name}</h3>
-                    ${generateStarRatingHtml()}
+                    <h3 title="${mod.name}">
+                        <a href="${cardModLink}" class="full-card-link" style="color: inherit; text-decoration: none;">
+                            ${mod.name}
+                        </a>
+                    </h3>
+                    <p>${mod.developer}</p>
+                    ${generateStarRatingHtml(mod.rating)}
                     <div class="card-footer">
-                        <span class="platform-tag ${mod.class}">${mod.tag}</span>
-                        <div class="view-count" style="display:flex; align-items:center; gap:4px; font-size:0.8em; color:var(--silver);">
-                            <i class="fas fa-eye" style="font-size:0.85em;"></i> ${mod.view}
+                        <span class="platform-tag ${mod.category}">${mod.tag}</span>
+                        <div class="view-count" title="${mod.views} Views">
+                            <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor">
+                                <path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/>
+                            </svg>
+                            ${mod.views}
                         </div>
                     </div>
+                </div>
+                
+                <div class="download-overlay" style="pointer-events: auto;">
+                    <a href="${cardModLink}" class="overlay-button overlay-btn-primary" style="margin-bottom: 8px;">View Mod</a>
+                    <a href="${MAIN_SITE_URL}/login" class="overlay-button overlay-btn-secondary wishlist-btn">
+                        <i class="fas fa-heart" style="font-size: 1.05em; flex-shrink: 0; color: var(--silver);"></i>
+                        <span>Add to Wishlist</span>
+                    </a>
                 </div>
             </div>
         `;
@@ -843,7 +865,7 @@ function spawnGhostElement() {
                     </div>
                     <span class="comment-author">${rName}</span>
                 </div>
-                ${generateStarRatingHtml()}
+                ${generateStarRatingHtml(5.0)}
                 <p class="comment-body">"${rText}"</p>
             </div>
         `;
