@@ -46,6 +46,21 @@
             -webkit-tap-highlight-color: transparent;
         }
 
+        /* Bulletproof Image Download & Long-Press Protection */
+        img,
+        .mod-card-image img,
+        .logo-img {
+            -webkit-touch-callout: none !important;
+            -webkit-user-select: none !important;
+            -khtml-user-select: none !important;
+            -moz-user-select: none !important;
+            -ms-user-select: none !important;
+            user-select: none !important;
+            -webkit-user-drag: none !important;
+            user-drag: none !important;
+            pointer-events: none !important;
+        }
+
         html, body {
             overflow-x: hidden;
             width: 100%;
@@ -252,8 +267,8 @@
         }
 
         .logo-main span {
-            color: var(--silver);
-            text-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
+            color: #e2e8f0;
+            text-shadow: 0 0 10px rgba(226, 232, 240, 0.6), 0 0 20px rgba(203, 213, 225, 0.3);
             font-weight: 400;
         }
 
@@ -1088,7 +1103,7 @@
                         <div class="mod-type-tag">v2.604</div>
                     </div>
                     <div class="mod-card-image">
-                        <img src="./assets/images/roblox.jpg" alt="Roblox Delta" onerror="this.src='./assets/images/default-avatar.png'">
+                        <img src="./assets/images/roblox.jpg" alt="Roblox Delta" draggable="false" oncontextmenu="return false;" onerror="this.src='./assets/images/default-avatar.png'">
                     </div>
                     <div class="mod-card-content">
                         <h3 title="Roblox Delta">
@@ -1124,7 +1139,7 @@
                         <div class="mod-type-tag">v7.3</div>
                     </div>
                     <div class="mod-card-image">
-                        <img src="./assets/images/kinemaster.jpg" alt="Kinemaster Pro" onerror="this.src='./assets/images/default-avatar.png'">
+                        <img src="./assets/images/kinemaster.jpg" alt="Kinemaster Pro" draggable="false" oncontextmenu="return false;" onerror="this.src='./assets/images/default-avatar.png'">
                     </div>
                     <div class="mod-card-content">
                         <h3 title="Kinemaster Pro">
@@ -1160,7 +1175,7 @@
                         <div class="mod-type-tag">v3.15</div>
                     </div>
                     <div class="mod-card-image">
-                        <img src="./assets/images/elementor.jpg" alt="Elementor Pro" onerror="this.src='./assets/images/default-avatar.png'">
+                        <img src="./assets/images/elementor.jpg" alt="Elementor Pro" draggable="false" oncontextmenu="return false;" onerror="this.src='./assets/images/default-avatar.png'">
                     </div>
                     <div class="mod-card-content">
                         <h3 title="Elementor Pro">
@@ -1196,7 +1211,7 @@
                         <div class="mod-type-tag">v29.10</div>
                     </div>
                     <div class="mod-card-image">
-                        <img src="./assets/images/fortnite.jpg" alt="Fortnite Mobile" onerror="this.src='./assets/images/default-avatar.png'">
+                        <img src="./assets/images/fortnite.jpg" alt="Fortnite Mobile" draggable="false" oncontextmenu="return false;" onerror="this.src='./assets/images/default-avatar.png'">
                     </div>
                     <div class="mod-card-content">
                         <h3 title="Fortnite Mobile">
@@ -1597,6 +1612,47 @@
             setupLipisRegion();
             performLivePing();
         });
+
+        // 13. BULLETPROOF IMAGE DOWNLOAD & EXTRACTION PROTECTION
+        (function() {
+            document.addEventListener('contextmenu', function(e) {
+                if (e.target.tagName === 'IMG' || e.target.closest('img') || e.target.closest('.mod-card-image')) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    return false;
+                }
+            }, { capture: true });
+
+            document.addEventListener('dragstart', function(e) {
+                if (e.target.tagName === 'IMG' || e.target.closest('img') || e.target.closest('.mod-card-image')) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    return false;
+                }
+            }, { capture: true });
+
+            let touchTimer = null;
+            document.addEventListener('touchstart', function(e) {
+                if (e.target.tagName === 'IMG' || e.target.closest('img') || e.target.closest('.mod-card-image') || e.target.closest('.logo-main')) {
+                    clearTimeout(touchTimer);
+                    touchTimer = setTimeout(() => {}, 250);
+                }
+            }, { passive: true });
+
+            document.addEventListener('touchend', function () {
+                if (touchTimer) clearTimeout(touchTimer);
+            }, { passive: true });
+
+            document.addEventListener('touchcancel', function () {
+                if (touchTimer) clearTimeout(touchTimer);
+            }, { passive: true });
+
+            document.addEventListener('gesturestart', function (e) {
+                if (e.target.tagName === 'IMG' || e.target.closest('img') || e.target.closest('.mod-card-image') || e.target.closest('.logo-main')) {
+                    e.preventDefault();
+                }
+            });
+        })();
     </script>
 </body>
 </html>

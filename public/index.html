@@ -59,10 +59,10 @@
             <div class="satellite-container" id="satellite-container">
                 <!-- Floating satellite icon badges for videos & 3D models -->
                 <div class="satellite-badge satellite-left" id="satellite-left" style="display: none;">
-                    <img id="satellite-left-img" src="/assets/images/default-app-icon.png" alt="App Icon">
+                    <img id="satellite-left-img" src="/assets/images/default-app-icon.png" alt="App Icon" draggable="false" oncontextmenu="return false;">
                 </div>
                 <div class="satellite-badge satellite-right" id="satellite-right" style="display: none;">
-                    <img id="satellite-right-img" src="/assets/images/default-avatar.png" alt="Icon">
+                    <img id="satellite-right-img" src="/assets/images/default-avatar.png" alt="Icon" draggable="false" oncontextmenu="return false;">
                 </div>
             </div>
 
@@ -76,7 +76,7 @@
                 <video id="dynamic-video" preload="auto" loop muted playsinline autoplay style="display: none;"></video>
 
                 <!-- 2. Fallback Image for standard mod screenshots -->
-                <img id="dynamic-image" src="" alt="Showcase Image" style="display: none;">
+                <img id="dynamic-image" src="" alt="Showcase Image" draggable="false" oncontextmenu="return false;" style="display: none;">
                 
                 <!-- 3. Model Viewer for 3D GLB Support -->
                 <model-viewer id="dynamic-model" src="" auto-rotate rotation-per-second="30deg" interaction-prompt="none" shadow-intensity="1" style="display: none;"></model-viewer>
@@ -161,5 +161,48 @@
 
     <!-- App Logic -->
     <script src="/js/app.js"></script>
+
+    <!-- Bulletproof Image Download & Extraction Protection -->
+    <script>
+        (function() {
+            document.addEventListener('contextmenu', function(e) {
+                if (e.target.tagName === 'IMG' || e.target.closest('img') || e.target.closest('.satellite-badge') || e.target.closest('.image-frame-wrapper')) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    return false;
+                }
+            }, { capture: true });
+
+            document.addEventListener('dragstart', function(e) {
+                if (e.target.tagName === 'IMG' || e.target.closest('img') || e.target.closest('.satellite-badge') || e.target.closest('.image-frame-wrapper')) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    return false;
+                }
+            }, { capture: true });
+
+            let touchTimer = null;
+            document.addEventListener('touchstart', function(e) {
+                if (e.target.tagName === 'IMG' || e.target.closest('img') || e.target.closest('.satellite-badge') || e.target.closest('.image-frame-wrapper')) {
+                    clearTimeout(touchTimer);
+                    touchTimer = setTimeout(() => {}, 250);
+                }
+            }, { passive: true });
+
+            document.addEventListener('touchend', function () {
+                if (touchTimer) clearTimeout(touchTimer);
+            }, { passive: true });
+
+            document.addEventListener('touchcancel', function () {
+                if (touchTimer) clearTimeout(touchTimer);
+            }, { passive: true });
+
+            document.addEventListener('gesturestart', function (e) {
+                if (e.target.tagName === 'IMG' || e.target.closest('img') || e.target.closest('.satellite-badge') || e.target.closest('.image-frame-wrapper')) {
+                    e.preventDefault();
+                }
+            });
+        })();
+    </script>
 </body>
 </html>
